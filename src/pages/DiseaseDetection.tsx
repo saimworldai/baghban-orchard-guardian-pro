@@ -6,6 +6,40 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 
+// Disease database for different detection results
+const diseaseDatabase = [
+  {
+    disease: 'Apple Scab',
+    severity: 'Moderate',
+    causes: ['Fungal infection (Venturia inaequalis)', 'High humidity', 'Poor air circulation'],
+    treatment: 'Apply copper-based fungicide and improve orchard ventilation. Prune affected areas and maintain proper tree spacing.'
+  },
+  {
+    disease: 'Fire Blight',
+    severity: 'Severe',
+    causes: ['Bacterial infection (Erwinia amylovora)', 'Warm, wet spring weather', 'Insect carriers'],
+    treatment: 'Remove infected branches by cutting at least 12 inches below visible symptoms. Sterilize pruning tools between cuts. Apply streptomycin sprays during bloom period.'
+  },
+  {
+    disease: 'Cedar Apple Rust',
+    severity: 'Mild',
+    causes: ['Fungal pathogen (Gymnosporangium juniperi-virginianae)', 'Proximity to cedar trees', 'Spring rainfall'],
+    treatment: 'Plant resistant apple varieties. Apply fungicides at bud break and during early fruit development. Remove nearby cedar trees if possible.'
+  },
+  {
+    disease: 'Powdery Mildew',
+    severity: 'Moderate',
+    causes: ['Fungal infection (Podosphaera leucotricha)', 'High humidity with moderate temperatures', 'Poor air circulation'],
+    treatment: 'Apply sulfur-based fungicides at first sign of infection. Increase spacing between trees. Prune to improve air circulation.'
+  },
+  {
+    disease: 'Sooty Blotch',
+    severity: 'Mild',
+    causes: ['Fungal complex', 'Long periods of high humidity', 'Rainy seasons'],
+    treatment: 'Apply fungicides during fruit development. Thin fruit to improve air circulation. Prune trees to open canopy.'
+  }
+];
+
 const DiseaseDetection: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -33,7 +67,7 @@ const DiseaseDetection: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
-        simulateDiseaseDetection();
+        // Don't automatically analyze - wait for user to click the button
       };
       reader.readAsDataURL(file);
     }
@@ -42,18 +76,26 @@ const DiseaseDetection: React.FC = () => {
   const simulateDiseaseDetection = () => {
     setIsAnalyzing(true);
     setProgress(0);
+    setDetectionResult(null);
+    
+    // Determine a "hash" from the image data to select a disease consistently for the same image
+    let hash = 0;
+    if (selectedImage) {
+      for (let i = 0; i < Math.min(selectedImage.length, 100); i++) {
+        hash = ((hash << 5) - hash) + selectedImage.charCodeAt(i);
+        hash = hash & hash; // Convert to 32bit integer
+      }
+    }
+    
+    // Use the absolute value of hash to ensure it's positive
+    const diseaseIndex = Math.abs(hash) % diseaseDatabase.length;
     
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsAnalyzing(false);
-          setDetectionResult({
-            disease: 'Apple Scab',
-            severity: 'Moderate',
-            causes: ['Fungal infection (Venturia inaequalis)', 'High humidity', 'Poor air circulation'],
-            treatment: 'Apply copper-based fungicide and improve orchard ventilation. Prune affected areas and maintain proper tree spacing.'
-          });
+          setDetectionResult(diseaseDatabase[diseaseIndex]);
           return 100;
         }
         return prev + 10;
