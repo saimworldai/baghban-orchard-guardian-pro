@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import ImageUploader from '@/components/disease-detection/ImageUploader';
 import AnalysisResults from '@/components/disease-detection/AnalysisResults';
-import { diseaseDatabase } from '@/constants/diseaseData';
 import { TreeDeciduous, Leaf, Microscope } from 'lucide-react';
+import { analyzeImageWithGemini, GeminiAnalysisResult } from '@/utils/geminiApi';
 
 const DiseaseDetection: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -17,6 +17,10 @@ const DiseaseDetection: React.FC = () => {
     severity?: string;
     causes?: string[];
     treatment?: string;
+    imageExplanation?: string;
+    prevention?: string;
+    cure?: string;
+    sprayUsage?: string;
   } | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [imageValidated, setImageValidated] = useState(false);
@@ -44,7 +48,7 @@ const DiseaseDetection: React.FC = () => {
     }
   };
 
-  const validateImage = (): Promise<boolean> => {
+  const validateImage = async (): Promise<boolean> => {
     return new Promise((resolve) => {
       setIsValidating(true);
       setProgress(0);
@@ -98,7 +102,7 @@ const DiseaseDetection: React.FC = () => {
     return Math.abs(hash) % 4 !== 0; // Changed from % 5 to % 4 to be more selective
   };
 
-  const simulateDiseaseDetection = async () => {
+  const analyzeImageWithGeminiAPI = async () => {
     setDetectionResult(null);
     
     // Always validate the image first, even if it was validated before
@@ -110,27 +114,70 @@ const DiseaseDetection: React.FC = () => {
     setIsAnalyzing(true);
     setProgress(0);
     
-    let hash = 0;
-    if (selectedImage) {
-      for (let i = 0; i < Math.min(selectedImage.length, 100); i++) {
-        hash = ((hash << 5) - hash) + selectedImage.charCodeAt(i);
-        hash = hash & hash;
-      }
-    }
-    
-    const diseaseIndex = Math.abs(hash) % diseaseDatabase.length;
-    
-    const interval = setInterval(() => {
+    // Set up progress simulation
+    const progressInterval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-          setDetectionResult(diseaseDatabase[diseaseIndex]);
-          return 100;
+        if (prev >= 90) {
+          return prev;
         }
         return prev + 10;
       });
-    }, 200);
+    }, 300);
+    
+    try {
+      if (!selectedImage) throw new Error("No image selected");
+      
+      // Call the Gemini API utility
+      const analysis: GeminiAnalysisResult = await analyzeImageWithGemini(selectedImage);
+      
+      clearInterval(progressInterval);
+      setProgress(100);
+      
+      // If not a valid plant image, set error and show only the explanation
+      if (!analysis.isValidPlant) {
+        setValidationError("The uploaded image does not appear to contain apples, leaves, branches, or trees. Please upload a relevant image for disease detection.");
+        setImageValidated(false);
+        
+        // Still show the image explanation
+        setDetectionResult({
+          imageExplanation: analysis.imageExplanation
+        });
+        
+        toast({
+          variant: "destructive",
+          title: "Invalid Image Content",
+          description: "Image does not contain relevant plant material for analysis."
+        });
+      } else {
+        // Valid plant image with full analysis
+        setDetectionResult({
+          disease: analysis.disease,
+          severity: analysis.severity,
+          causes: analysis.causes,
+          treatment: analysis.treatment,
+          imageExplanation: analysis.imageExplanation,
+          prevention: analysis.prevention,
+          cure: analysis.cure,
+          sprayUsage: analysis.sprayUsage
+        });
+        
+        toast({
+          title: "Analysis Complete",
+          description: analysis.disease ? `Detected: ${analysis.disease}` : "Image analyzed successfully"
+        });
+      }
+    } catch (error) {
+      console.error("Error during image analysis:", error);
+      toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: "There was an error analyzing your image. Please try again."
+      });
+    } finally {
+      clearInterval(progressInterval);
+      setProgress(100);
+      setTimeout(() => setIsAnalyzing(false), 500);
+    }
   };
 
   // Validate image immediately after upload
@@ -174,7 +221,7 @@ const DiseaseDetection: React.FC = () => {
             selectedImage={selectedImage}
             onImageUpload={handleImageUpload}
             validationError={validationError}
-            onAnalyze={simulateDiseaseDetection}
+            onAnalyze={analyzeImageWithGeminiAPI}
             isAnalyzing={isAnalyzing}
             isValidating={isValidating}
           />

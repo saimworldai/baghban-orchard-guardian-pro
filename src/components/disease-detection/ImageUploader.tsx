@@ -98,7 +98,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           </Button>
           <Button 
             className="flex-1 min-w-[120px] bg-gradient-to-r from-green-600 to-primary hover:from-green-700 hover:to-primary/90"
-            disabled={!selectedImage || isAnalyzing || isValidating || validationError}
+            disabled={!selectedImage || isAnalyzing || isValidating || Boolean(validationError)}
             onClick={onAnalyze}
           >
             <ScanLine className="mr-2 h-4 w-4" />
