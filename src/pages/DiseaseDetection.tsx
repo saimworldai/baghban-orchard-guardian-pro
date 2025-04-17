@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import ImageUploader from '@/components/disease-detection/ImageUploader';
@@ -18,6 +19,7 @@ const DiseaseDetection: React.FC = () => {
     treatment?: string;
   } | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [imageValidated, setImageValidated] = useState(false);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -36,6 +38,7 @@ const DiseaseDetection: React.FC = () => {
         setSelectedImage(reader.result as string);
         setValidationError(null);
         setDetectionResult(null);
+        setImageValidated(false); // Reset validation state when a new image is uploaded
       };
       reader.readAsDataURL(file);
     }
@@ -59,9 +62,20 @@ const DiseaseDetection: React.FC = () => {
           
           if (!isAppleOrTree) {
             setValidationError("The uploaded image does not appear to contain apples, leaves, branches, or trees. Please upload a relevant image for disease detection.");
+            setImageValidated(false);
+            toast({
+              variant: "destructive",
+              title: "Invalid Image Content",
+              description: "Please upload an image of apples, leaves, branches, or trees for analysis."
+            });
             resolve(false);
           } else {
             setValidationError(null);
+            setImageValidated(true);
+            toast({
+              title: "Image Validated",
+              description: "Image contains valid content for disease detection analysis."
+            });
             resolve(true);
           }
         }
@@ -72,18 +86,22 @@ const DiseaseDetection: React.FC = () => {
   const simulateImageContentCheck = (): boolean => {
     if (!selectedImage) return false;
     
+    // This is a simulation. In a real app, you would use ML/AI to detect the image content
+    // For demo purposes, we're using a hash-based approach to simulate validation
     let hash = 0;
     for (let i = 0; i < Math.min(selectedImage.length, 100); i++) {
       hash = ((hash << 5) - hash) + selectedImage.charCodeAt(i);
       hash = hash & hash;
     }
     
-    return Math.abs(hash) % 5 !== 0;
+    // Make the validation slightly stricter by returning false more often
+    return Math.abs(hash) % 4 !== 0; // Changed from % 5 to % 4 to be more selective
   };
 
   const simulateDiseaseDetection = async () => {
     setDetectionResult(null);
     
+    // Always validate the image first, even if it was validated before
     const isValid = await validateImage();
     if (!isValid) {
       return;
@@ -114,6 +132,23 @@ const DiseaseDetection: React.FC = () => {
       });
     }, 200);
   };
+
+  // Validate image immediately after upload
+  const validateImageOnUpload = () => {
+    if (selectedImage && !imageValidated && !isValidating) {
+      validateImage();
+    }
+  };
+
+  // Call validation when the selectedImage changes
+  React.useEffect(() => {
+    if (selectedImage && !imageValidated) {
+      const timer = setTimeout(() => {
+        validateImageOnUpload();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedImage]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8">
@@ -149,7 +184,10 @@ const DiseaseDetection: React.FC = () => {
             detectionResult={detectionResult}
             isAnalyzing={isAnalyzing}
             progress={progress}
-            onReset={() => setValidationError(null)}
+            onReset={() => {
+              setValidationError(null);
+              setImageValidated(false);
+            }}
           />
         </div>
       </div>

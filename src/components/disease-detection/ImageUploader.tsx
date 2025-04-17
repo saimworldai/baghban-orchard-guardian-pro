@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Upload, Camera, ImagePlus, ScanLine } from 'lucide-react';
+import { Upload, Camera, ImagePlus, ScanLine, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -51,6 +51,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 <div className="absolute inset-0 bg-primary/10 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                   <Upload size={32} className="text-primary" />
                 </div>
+                
+                {!validationError && !isValidating && (
+                  <div className="absolute -top-2 -right-2 bg-green-100 rounded-full p-1 border-2 border-white shadow-md">
+                    <CheckCircle2 size={16} className="text-green-600" />
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-4 py-10">
@@ -61,6 +67,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
                 <p className="text-xs text-muted-foreground/70">
                   Supports: JPG, PNG, WEBP (max 5MB)
                 </p>
+                <p className="text-xs text-amber-500 font-medium mt-2">
+                  * Only upload images of apples, leaves, branches, or trees
+                </p>
               </div>
             )}
           </label>
@@ -69,8 +78,16 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         {validationError && (
           <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
             <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Invalid Image</AlertTitle>
+            <AlertTitle>Invalid Image Content</AlertTitle>
             <AlertDescription>{validationError}</AlertDescription>
+          </Alert>
+        )}
+
+        {selectedImage && !validationError && !isValidating && (
+          <Alert className="bg-green-50 border-green-100 text-green-800">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <AlertTitle>Valid Image</AlertTitle>
+            <AlertDescription>Your image is suitable for disease detection.</AlertDescription>
           </Alert>
         )}
 
@@ -81,7 +98,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           </Button>
           <Button 
             className="flex-1 min-w-[120px] bg-gradient-to-r from-green-600 to-primary hover:from-green-700 hover:to-primary/90"
-            disabled={!selectedImage || isAnalyzing || isValidating}
+            disabled={!selectedImage || isAnalyzing || isValidating || validationError}
             onClick={onAnalyze}
           >
             <ScanLine className="mr-2 h-4 w-4" />
