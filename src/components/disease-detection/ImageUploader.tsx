@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { Upload, Camera } from 'lucide-react';
+import { Upload, Camera, ImagePlus, ScanLine } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 interface ImageUploaderProps {
   selectedImage: string | null;
@@ -25,15 +24,15 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   isValidating
 }) => {
   return (
-    <Card className="p-4">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="h-5 w-5" />
-          Upload Image
+    <Card className="overflow-hidden border border-primary/10 backdrop-blur-sm bg-white/90 shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/10">
+        <CardTitle className="flex items-center gap-2 text-primary">
+          <ImagePlus className="h-5 w-5" />
+          Upload Image for Analysis
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors">
+      <CardContent className="p-6 space-y-6">
+        <div className="border-2 border-dashed rounded-xl p-8 text-center hover:border-primary transition-colors group relative">
           <input
             type="file"
             accept="image/*"
@@ -43,16 +42,24 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
           />
           <label htmlFor="imageUpload" className="cursor-pointer block">
             {selectedImage ? (
-              <img
-                src={selectedImage}
-                alt="Uploaded"
-                className="max-h-64 mx-auto rounded-lg shadow-md"
-              />
+              <div className="relative">
+                <img
+                  src={selectedImage}
+                  alt="Uploaded"
+                  className="max-h-64 mx-auto rounded-lg shadow-md transition-transform hover:scale-[1.02]"
+                />
+                <div className="absolute inset-0 bg-primary/10 opacity-0 hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                  <Upload size={32} className="text-primary" />
+                </div>
+              </div>
             ) : (
-              <div className="space-y-4">
-                <Upload size={48} className="mx-auto text-muted-foreground" />
+              <div className="space-y-4 py-10">
+                <ScanLine size={64} className="mx-auto text-primary/60" />
                 <p className="text-muted-foreground">
-                  Click or drag and drop to upload
+                  Drop your image here or click to browse
+                </p>
+                <p className="text-xs text-muted-foreground/70">
+                  Supports: JPG, PNG, WEBP (max 5MB)
                 </p>
               </div>
             )}
@@ -60,24 +67,24 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
         </div>
 
         {validationError && (
-          <Alert variant="destructive" className="mt-4">
+          <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Invalid Image</AlertTitle>
             <AlertDescription>{validationError}</AlertDescription>
           </Alert>
         )}
 
-        <div className="flex flex-wrap gap-4 justify-center mt-6">
-          <Button variant="outline" className="flex-1 min-w-[120px]">
+        <div className="flex flex-wrap gap-4">
+          <Button variant="outline" className="flex-1 min-w-[120px] border-primary/20 bg-primary/5 hover:bg-primary/10">
             <Camera className="mr-2 h-4 w-4" />
             Take Photo
           </Button>
           <Button 
-            className="flex-1 min-w-[120px]"
+            className="flex-1 min-w-[120px] bg-gradient-to-r from-green-600 to-primary hover:from-green-700 hover:to-primary/90"
             disabled={!selectedImage || isAnalyzing || isValidating}
             onClick={onAnalyze}
           >
-            <Upload className="mr-2 h-4 w-4" />
+            <ScanLine className="mr-2 h-4 w-4" />
             Analyze Image
           </Button>
         </div>

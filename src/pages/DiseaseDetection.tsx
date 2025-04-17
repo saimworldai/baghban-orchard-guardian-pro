@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import ImageUploader from '@/components/disease-detection/ImageUploader';
 import AnalysisResults from '@/components/disease-detection/AnalysisResults';
 import { diseaseDatabase } from '@/constants/diseaseData';
+import { TreeDeciduous, Leaf, Microscope } from 'lucide-react';
 
 const DiseaseDetection: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -116,31 +116,42 @@ const DiseaseDetection: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <div className="text-center max-w-2xl mx-auto mb-8">
-        <h1 className="text-3xl font-bold mb-4">Disease Detection</h1>
-        <p className="text-muted-foreground">
-          Upload photos of leaves, branches, or fruits to detect early signs of disease using AI analysis.
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-8">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE1MCA3NXYyNUgwdi0yNWgxNTB6bTAgNTB2MjVIMHYtMjVoMTUwek0wIDE1MHYyNWgxNTB2LTI1SDB6TTAgMHYyNWgxNTBWMEgweiIgZmlsbD0iIzAwNjkwMCIgZmlsbC1vcGFjaXR5PSIuMDIiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==')] bg-repeat opacity-10 -z-10"></div>
+      
+      <div className="container mx-auto px-4 space-y-8">
+        <div className="text-center max-w-3xl mx-auto mb-10 relative">
+          <div className="absolute -z-10 inset-0 flex items-center justify-center opacity-10">
+            <Microscope size={140} className="text-primary" />
+            <Leaf size={120} className="text-green-600 ml-20 mt-10" />
+          </div>
+          
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-700 to-primary bg-clip-text text-transparent mb-4">
+            Disease Detection
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Upload photos of leaves, branches, or fruits to detect early signs of disease using our advanced AI analysis. Early detection helps protect your orchard health.
+          </p>
+        </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
-        <ImageUploader
-          selectedImage={selectedImage}
-          onImageUpload={handleImageUpload}
-          validationError={validationError}
-          onAnalyze={simulateDiseaseDetection}
-          isAnalyzing={isAnalyzing}
-          isValidating={isValidating}
-        />
-        <AnalysisResults
-          isValidating={isValidating}
-          validationError={validationError}
-          detectionResult={detectionResult}
-          isAnalyzing={isAnalyzing}
-          progress={progress}
-          onReset={() => setValidationError(null)}
-        />
+        <div className="grid md:grid-cols-2 gap-8 items-start">
+          <ImageUploader
+            selectedImage={selectedImage}
+            onImageUpload={handleImageUpload}
+            validationError={validationError}
+            onAnalyze={simulateDiseaseDetection}
+            isAnalyzing={isAnalyzing}
+            isValidating={isValidating}
+          />
+          <AnalysisResults
+            isValidating={isValidating}
+            validationError={validationError}
+            detectionResult={detectionResult}
+            isAnalyzing={isAnalyzing}
+            progress={progress}
+            onReset={() => setValidationError(null)}
+          />
+        </div>
       </div>
     </div>
   );
