@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TreeDeciduous, ImageOff, CheckCircle, AlertTriangle, Leaf, Apple, Bug, Microscope, Gauge, PestControl, Sprout, Droplets } from 'lucide-react';
+import { TreeDeciduous, ImageOff, CheckCircle, AlertTriangle, Leaf, Apple, Bug, Microscope, Gauge, Spray, Sprout, Droplets } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AnalysisResultsProps {
@@ -158,7 +157,7 @@ const AnalysisResults: React.FC<AnalysisResultsProps> = ({
             {detectionResult.cure && (
               <div className="bg-purple-50/50 rounded-lg p-4 border border-purple-100">
                 <h3 className="font-semibold text-purple-700 mb-2 flex items-center gap-1">
-                  <PestControl className="h-4 w-4" /> Cure
+                  <Spray className="h-4 w-4" /> Cure
                 </h3>
                 <p className="text-muted-foreground">{detectionResult.cure}</p>
               </div>
