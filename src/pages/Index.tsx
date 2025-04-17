@@ -10,7 +10,6 @@ import {
   CalendarDays,
   Leaf,
   Sun,
-  Tree,  // Replace Plant with Tree
   Droplet,
   BarChart
 } from 'lucide-react';
@@ -67,8 +66,8 @@ const features = [
     link: '#'
   },
   {
-    name: 'Tree Health', // Updated name to match Tree icon
-    icon: Tree, // Replaced Plant with Tree
+    name: 'Tree Health',
+    icon: TreeDeciduous,
     description: 'Comprehensive tree growth and health monitoring',
     color: 'from-green-500/20 to-emerald-500/20',
     textColor: 'text-green-700',
@@ -88,7 +87,7 @@ const Index = () => {
         <div className="flex flex-col items-center justify-center mb-12 relative">
           <div className="absolute -z-10 opacity-20">
             <TreeDeciduous size={120} className="text-green-600" />
-            <Tree size={80} className="text-green-700 absolute -right-20 top-10" /> {/* Replaced Plant with Tree */}
+            <TreeDeciduous size={80} className="text-green-700 absolute -right-20 top-10" />
             <Leaf size={60} className="text-green-500 absolute -left-16 top-16" />
             <Droplet size={40} className="text-blue-500 absolute right-10 -top-10" />
             <Sun size={50} className="text-yellow-500 absolute -left-24 -top-5" />
@@ -154,7 +153,7 @@ const Index = () => {
                   <p className="text-sm text-center">Monitor & improve production</p>
                 </div>
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg flex flex-col items-center justify-center text-purple-700 h-40">
-                  <Tree size={40} className="mb-2" />
+                  <TreeDeciduous size={40} className="mb-2" />
                   <h3 className="text-lg font-semibold">Growth Analysis</h3>
                   <p className="text-sm text-center">Track tree health & growth</p>
                 </div>
