@@ -1,7 +1,7 @@
 
 import { toast } from "@/components/ui/use-toast";
 
-const API_KEY = "7e830414250141da9ab72638251904";
+const API_KEY = "4ee0eb9461ef4848a0c73126251904";
 const BASE_URL = "https://api.weatherbit.io/v2.0";
 
 export interface WeatherData {
@@ -51,15 +51,20 @@ export interface ForecastData {
 // Get weather by coordinates
 export const getWeatherByCoords = async (lat: number, lon: number): Promise<WeatherData | null> => {
   try {
+    console.log(`Fetching weather for coordinates: ${lat}, ${lon}`);
     const response = await fetch(
       `${BASE_URL}/current?lat=${lat}&lon=${lon}&key=${API_KEY}&include=minutely`
     );
     
     if (!response.ok) {
-      throw new Error(`Weather API error: ${response.status}`);
+      const errorData = await response.json();
+      console.error("Weather API error:", errorData);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log("Weather data fetched successfully:", data);
+    return data;
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
     toast({
@@ -74,15 +79,20 @@ export const getWeatherByCoords = async (lat: number, lon: number): Promise<Weat
 // Get weather by city name
 export const getWeatherByCity = async (city: string): Promise<WeatherData | null> => {
   try {
+    console.log(`Fetching weather for city: ${city}`);
     const response = await fetch(
       `${BASE_URL}/current?city=${encodeURIComponent(city)}&key=${API_KEY}`
     );
     
     if (!response.ok) {
-      throw new Error(`Weather API error: ${response.status}`);
+      const errorData = await response.json();
+      console.error("Weather API error:", errorData);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log("Weather data fetched successfully:", data);
+    return data;
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
     toast({
@@ -97,15 +107,20 @@ export const getWeatherByCity = async (city: string): Promise<WeatherData | null
 // Get 5-day forecast by coordinates
 export const getForecastByCoords = async (lat: number, lon: number): Promise<ForecastData | null> => {
   try {
+    console.log(`Fetching forecast for coordinates: ${lat}, ${lon}`);
     const response = await fetch(
       `${BASE_URL}/forecast/daily?lat=${lat}&lon=${lon}&key=${API_KEY}&days=5`
     );
     
     if (!response.ok) {
-      throw new Error(`Weather API error: ${response.status}`);
+      const errorData = await response.json();
+      console.error("Weather API error:", errorData);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log("Forecast data fetched successfully:", data);
+    return data;
   } catch (error) {
     console.error("Failed to fetch forecast data:", error);
     toast({
@@ -120,15 +135,20 @@ export const getForecastByCoords = async (lat: number, lon: number): Promise<For
 // Get 5-day forecast by city name
 export const getForecastByCity = async (city: string): Promise<ForecastData | null> => {
   try {
+    console.log(`Fetching forecast for city: ${city}`);
     const response = await fetch(
       `${BASE_URL}/forecast/daily?city=${encodeURIComponent(city)}&key=${API_KEY}&days=5`
     );
     
     if (!response.ok) {
-      throw new Error(`Weather API error: ${response.status}`);
+      const errorData = await response.json();
+      console.error("Weather API error:", errorData);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log("Forecast data fetched successfully:", data);
+    return data;
   } catch (error) {
     console.error("Failed to fetch forecast data:", error);
     toast({

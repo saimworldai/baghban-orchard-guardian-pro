@@ -35,7 +35,11 @@ const WeatherAlerts: React.FC = () => {
     'Kashmir Orchard', 
     'Himachal Apple Farm', 
     'Uttarakhand Highlands', 
-    'Kinnaur Valley'
+    'Kinnaur Valley',
+    'Srinagar',
+    'Shimla',
+    'Dehradun',
+    'Manali'
   ];
 
   // Function to get user's current location
@@ -96,9 +100,14 @@ const WeatherAlerts: React.FC = () => {
         setLastUpdated(new Date().toLocaleTimeString());
         
         // If fetched by coordinates, update the location state
-        if (lat !== undefined && lon !== undefined) {
+        if (lat !== undefined && lon !== undefined && weatherData.city_name) {
           setLocation(weatherData.city_name);
         }
+        
+        toast({
+          title: "Weather Updated",
+          description: `Latest weather data for ${weatherData.city_name} loaded successfully.`,
+        });
       }
     } catch (error) {
       console.error("Error fetching weather data:", error);
@@ -231,7 +240,7 @@ const WeatherAlerts: React.FC = () => {
             variant="outline" 
             className="w-full sm:w-auto flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
             onClick={getCurrentLocation}
-            disabled={locating}
+            disabled={locating || loading}
           >
             {locating ? (
               <Loader className="h-4 w-4 animate-spin" />
@@ -293,8 +302,8 @@ const WeatherAlerts: React.FC = () => {
               </div>
             ) : currentWeather && currentWeather.data ? (
               <>
-                <div className="flex items-center justify-between p-4 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                  <div className="flex items-center gap-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between p-4 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                  <div className="flex items-center gap-6 mb-4 sm:mb-0">
                     {React.createElement(
                       getIconComponent(currentWeather.data[0].weather.code),
                       { size: 64, className: "text-blue-500" }
@@ -309,7 +318,7 @@ const WeatherAlerts: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-8">
+                  <div className="grid grid-cols-3 gap-6">
                     <div className="text-center">
                       <Droplet className="h-5 w-5 mx-auto mb-1 text-blue-600" />
                       <p className="text-xs text-muted-foreground">Humidity</p>
