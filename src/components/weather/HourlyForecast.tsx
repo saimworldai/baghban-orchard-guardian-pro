@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Clock, Wind, Droplets } from 'lucide-react';
+import { Clock, Wind, Droplet } from 'lucide-react';
 
 interface HourlyForecastProps {
   hours: Array<{
@@ -19,7 +19,7 @@ interface HourlyForecastProps {
   }>;
 }
 
-export const HourlyForecast: React.FC<HourlyForecastProps> = ({ hours }) => {
+const HourlyForecast: React.FC<HourlyForecastProps> = ({ hours }) => {
   return (
     <Card className="p-4 bg-white/90 border border-blue-200">
       <h3 className="text-lg font-semibold mb-4 text-blue-700">Today's Hourly Forecast</h3>
@@ -45,7 +45,7 @@ export const HourlyForecast: React.FC<HourlyForecastProps> = ({ hours }) => {
                   <span className="text-xs">{Math.round(hour.wind_kph)} km/h</span>
                 </div>
                 <div className="flex items-center justify-center gap-1 mt-1 text-blue-600">
-                  <Droplets className="h-3 w-3" />
+                  <Droplet className="h-3 w-3" />
                   <span className="text-xs">{hour.chance_of_rain}%</span>
                 </div>
               </div>
@@ -56,3 +56,5 @@ export const HourlyForecast: React.FC<HourlyForecastProps> = ({ hours }) => {
     </Card>
   );
 };
+
+export default HourlyForecast;
