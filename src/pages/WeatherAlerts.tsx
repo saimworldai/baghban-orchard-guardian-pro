@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Cloud, Sun, Wind, CloudRain, Thermometer, CloudLightning, 
@@ -30,7 +29,6 @@ const WeatherAlerts: React.FC = () => {
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
 
-  // Locations the user can select from
   const locations = [
     'Kashmir Orchard', 
     'Himachal Apple Farm', 
@@ -42,7 +40,6 @@ const WeatherAlerts: React.FC = () => {
     'Manali'
   ];
 
-  // Function to get user's current location
   const getCurrentLocation = () => {
     setLocating(true);
     
@@ -75,7 +72,6 @@ const WeatherAlerts: React.FC = () => {
     );
   };
 
-  // Fetch weather data based on coordinates or city
   const fetchWeatherData = async (lat?: number, lon?: number) => {
     setLoading(true);
     try {
@@ -83,11 +79,9 @@ const WeatherAlerts: React.FC = () => {
       let forecastData;
       
       if (lat !== undefined && lon !== undefined) {
-        // Fetch by coordinates
         weatherData = await getWeatherByCoords(lat, lon);
         forecastData = await getForecastByCoords(lat, lon);
       } else if (location) {
-        // Fetch by city name
         weatherData = await getWeatherByCity(location);
         forecastData = await getForecastByCity(location);
       } else {
@@ -99,7 +93,6 @@ const WeatherAlerts: React.FC = () => {
         setForecast(forecastData);
         setLastUpdated(new Date().toLocaleTimeString());
         
-        // If fetched by coordinates, update the location state
         if (lat !== undefined && lon !== undefined && weatherData.city_name) {
           setLocation(weatherData.city_name);
         }
@@ -121,13 +114,11 @@ const WeatherAlerts: React.FC = () => {
     }
   };
 
-  // Change location handler
   const handleLocationChange = (value: string) => {
     setLocation(value);
     fetchWeatherData();
   };
 
-  // Refresh weather data
   const handleRefresh = () => {
     if (location) {
       fetchWeatherData();
@@ -136,7 +127,6 @@ const WeatherAlerts: React.FC = () => {
     }
   };
 
-  // Get icon component based on weather code
   const getIconComponent = (code: number) => {
     const iconName = getWeatherIcon(code);
     
@@ -152,12 +142,10 @@ const WeatherAlerts: React.FC = () => {
     }
   };
 
-  // Load initial data
   useEffect(() => {
     getCurrentLocation();
   }, []);
 
-  // Create weather forecast cards
   const renderForecastCards = () => {
     if (!forecast) return null;
     
@@ -302,42 +290,29 @@ const WeatherAlerts: React.FC = () => {
               </div>
             ) : currentWeather && currentWeather.data ? (
               <>
-                <div className="flex flex-col sm:flex-row items-center justify-between p-4 mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                  <div className="flex items-center gap-6 mb-4 sm:mb-0">
-                    {React.createElement(
-                      getIconComponent(currentWeather.data[0].weather.code),
-                      { size: 64, className: "text-blue-500" }
-                    )}
-                    <div>
-                      <p className="text-muted-foreground">Current Temperature</p>
-                      <p className="text-5xl font-bold text-blue-700">
-                        {Math.round(currentWeather.data[0].temp)}°C
-                      </p>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {currentWeather.data[0].weather.description}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <Droplet className="h-5 w-5 mx-auto mb-1 text-blue-600" />
-                      <p className="text-xs text-muted-foreground">Humidity</p>
-                      <p className="text-lg font-semibold">{currentWeather.data[0].rh}%</p>
-                    </div>
-                    <div className="text-center">
-                      <Wind className="h-5 w-5 mx-auto mb-1 text-blue-600" />
-                      <p className="text-xs text-muted-foreground">Wind</p>
-                      <p className="text-lg font-semibold">{Math.round(currentWeather.data[0].wind_spd)} km/h</p>
-                    </div>
-                    <div className="text-center">
-                      <Umbrella className="h-5 w-5 mx-auto mb-1 text-blue-600" />
-                      <p className="text-xs text-muted-foreground">Precipitation</p>
-                      <p className="text-lg font-semibold">{currentWeather.data[0].precip} mm</p>
-                    </div>
+                <div className="flex flex-col sm:flex-row items-center justify-between p-6 mb-8 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-100">
+                  {React.createElement(
+                    getIconComponent(currentWeather.data[0].weather.code),
+                    { size: 64, className: "text-blue-500" }
+                  )}
+                  <div>
+                    <p className="text-muted-foreground">Current Temperature</p>
+                    <p className="text-5xl font-bold text-blue-700">
+                      {Math.round(currentWeather.data[0].temp)}°C
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {currentWeather.data[0].weather.description}
+                    </p>
                   </div>
                 </div>
 
-                <h2 className="text-xl font-semibold mb-4 text-blue-800">5-Day Forecast & Spray Schedule</h2>
+                {forecast && forecast.data[0].hour && (
+                  <div className="mb-8">
+                    <HourlyForecast hours={forecast.data[0].hour} />
+                  </div>
+                )}
+
+                <h2 className="text-xl font-semibold mb-4 text-blue-800">15-Day Forecast & Spray Schedule</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                   {renderForecastCards()}
                 </div>
@@ -352,12 +327,23 @@ const WeatherAlerts: React.FC = () => {
               </div>
             )}
             
-            <Alert className="mt-8 bg-blue-50 border-blue-200">
-              <AlertTriangle className="h-5 w-5 text-blue-600" />
-              <AlertTitle className="text-blue-700">Spray Schedule Information</AlertTitle>
-              <AlertDescription className="text-blue-600">
-                Spray recommendations are based on weather conditions, disease risk factors, and optimal application timing. Always follow product-specific guidelines and safety precautions.
-              </AlertDescription>
+            <Alert className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="h-5 w-5 text-blue-600 mt-1" />
+                <div>
+                  <AlertTitle className="text-blue-700 font-semibold mb-2">Spray Schedule Information</AlertTitle>
+                  <AlertDescription className="text-blue-600">
+                    Our spray recommendations are calculated based on comprehensive weather analysis including:
+                    <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li>Temperature and humidity levels</li>
+                      <li>Wind speed and direction</li>
+                      <li>Precipitation probability</li>
+                      <li>Weather conditions and visibility</li>
+                    </ul>
+                    Always follow product-specific guidelines and safety precautions.
+                  </AlertDescription>
+                </div>
+              </div>
             </Alert>
           </CardContent>
         </Card>
