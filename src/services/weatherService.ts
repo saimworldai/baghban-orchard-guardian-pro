@@ -2,7 +2,7 @@
 import { toast } from "@/components/ui/use-toast";
 
 const API_KEY = "4ee0eb9461ef4848a0c73126251904";
-const BASE_URL = "https://api.weatherbit.io/v2.0";
+const BASE_URL = "https://api.weatherapi.com/v1";
 
 export interface WeatherData {
   city_name: string;
@@ -48,23 +48,73 @@ export interface ForecastData {
   }>;
 }
 
+// Transform WeatherAPI.com data to match our interface
+const transformCurrentWeather = (apiData: any): WeatherData => {
+  return {
+    city_name: apiData.location.name,
+    country_code: apiData.location.country,
+    data: [{
+      temp: apiData.current.temp_c,
+      app_temp: apiData.current.feelslike_c,
+      rh: apiData.current.humidity,
+      wind_spd: apiData.current.wind_kph,
+      wind_cdir_full: apiData.current.wind_dir,
+      weather: {
+        icon: apiData.current.condition.icon,
+        description: apiData.current.condition.text,
+        code: apiData.current.condition.code
+      },
+      precip: apiData.current.precip_mm,
+      pop: 0, // WeatherAPI.com doesn't provide probability of precipitation in current weather
+      datetime: apiData.location.localtime,
+      ts: new Date(apiData.location.localtime).getTime() / 1000,
+      pres: apiData.current.pressure_mb,
+      clouds: apiData.current.cloud
+    }]
+  };
+};
+
+// Transform WeatherAPI.com forecast data to match our interface
+const transformForecastData = (apiData: any): ForecastData => {
+  return {
+    city_name: apiData.location.name,
+    country_code: apiData.location.country,
+    data: apiData.forecast.forecastday.map((day: any) => ({
+      temp: day.day.avgtemp_c,
+      max_temp: day.day.maxtemp_c,
+      min_temp: day.day.mintemp_c,
+      rh: day.day.avghumidity,
+      wind_spd: day.day.maxwind_kph,
+      precip: day.day.totalprecip_mm,
+      pop: day.day.daily_chance_of_rain,
+      weather: {
+        icon: day.day.condition.icon,
+        description: day.day.condition.text,
+        code: day.day.condition.code
+      },
+      datetime: day.date,
+      valid_date: day.date
+    }))
+  };
+};
+
 // Get weather by coordinates
 export const getWeatherByCoords = async (lat: number, lon: number): Promise<WeatherData | null> => {
   try {
     console.log(`Fetching weather for coordinates: ${lat}, ${lon}`);
     const response = await fetch(
-      `${BASE_URL}/current?lat=${lat}&lon=${lon}&key=${API_KEY}&include=minutely`
+      `${BASE_URL}/current.json?key=${API_KEY}&q=${lat},${lon}&aqi=no`
     );
     
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Weather API error:", errorData);
-      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
     }
     
     const data = await response.json();
     console.log("Weather data fetched successfully:", data);
-    return data;
+    return transformCurrentWeather(data);
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
     toast({
@@ -81,18 +131,18 @@ export const getWeatherByCity = async (city: string): Promise<WeatherData | null
   try {
     console.log(`Fetching weather for city: ${city}`);
     const response = await fetch(
-      `${BASE_URL}/current?city=${encodeURIComponent(city)}&key=${API_KEY}`
+      `${BASE_URL}/current.json?key=${API_KEY}&q=${encodeURIComponent(city)}&aqi=no`
     );
     
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Weather API error:", errorData);
-      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
     }
     
     const data = await response.json();
     console.log("Weather data fetched successfully:", data);
-    return data;
+    return transformCurrentWeather(data);
   } catch (error) {
     console.error("Failed to fetch weather data:", error);
     toast({
@@ -109,18 +159,18 @@ export const getForecastByCoords = async (lat: number, lon: number): Promise<For
   try {
     console.log(`Fetching forecast for coordinates: ${lat}, ${lon}`);
     const response = await fetch(
-      `${BASE_URL}/forecast/daily?lat=${lat}&lon=${lon}&key=${API_KEY}&days=5`
+      `${BASE_URL}/forecast.json?key=${API_KEY}&q=${lat},${lon}&days=5&aqi=no&alerts=no`
     );
     
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Weather API error:", errorData);
-      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
     }
     
     const data = await response.json();
     console.log("Forecast data fetched successfully:", data);
-    return data;
+    return transformForecastData(data);
   } catch (error) {
     console.error("Failed to fetch forecast data:", error);
     toast({
@@ -137,18 +187,18 @@ export const getForecastByCity = async (city: string): Promise<ForecastData | nu
   try {
     console.log(`Fetching forecast for city: ${city}`);
     const response = await fetch(
-      `${BASE_URL}/forecast/daily?city=${encodeURIComponent(city)}&key=${API_KEY}&days=5`
+      `${BASE_URL}/forecast.json?key=${API_KEY}&q=${encodeURIComponent(city)}&days=5&aqi=no&alerts=no`
     );
     
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Weather API error:", errorData);
-      throw new Error(`Weather API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
     }
     
     const data = await response.json();
     console.log("Forecast data fetched successfully:", data);
-    return data;
+    return transformForecastData(data);
   } catch (error) {
     console.error("Failed to fetch forecast data:", error);
     toast({
@@ -168,26 +218,27 @@ export const getSprayRecommendation = (
   humidity: number,
   temperature: number
 ): { recommended: boolean; reason: string } => {
-  // Weather codes: https://www.weatherbit.io/api/codes
+  // Weather codes for WeatherAPI.com are different from Weatherbit
+  // Reference: https://www.weatherapi.com/docs/weather_conditions.json
   
   // Check for adverse weather conditions first
-  if (weatherCode >= 200 && weatherCode < 300) {
+  // Thunderstorm, rain, snow, freezing conditions
+  if ([1087, 1273, 1276, 1279, 1282].includes(weatherCode)) {
     return { recommended: false, reason: "Thunderstorm activity - unsafe for spraying operations" };
   }
   
-  if (weatherCode >= 300 && weatherCode < 400) {
-    return { recommended: false, reason: "Drizzle conditions - spraying may be ineffective due to wash-off" };
+  // Rain, drizzle
+  if ([1063, 1150, 1153, 1180, 1183, 1186, 1189, 1192, 1195, 1240, 1243, 1246].includes(weatherCode)) {
+    return { recommended: false, reason: "Rain or drizzle conditions - spraying may be ineffective due to wash-off" };
   }
   
-  if (weatherCode >= 500 && weatherCode < 600) {
-    return { recommended: false, reason: "Rain forecasted - spraying ineffective due to wash-off" };
-  }
-  
-  if (weatherCode >= 600 && weatherCode < 700) {
+  // Snow, sleet
+  if ([1066, 1069, 1072, 1114, 1117, 1147, 1168, 1171, 1198, 1201, 1204, 1207, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258, 1261, 1264].includes(weatherCode)) {
     return { recommended: false, reason: "Snow or freezing conditions - postpone spraying until temperatures rise" };
   }
   
-  if (weatherCode >= 700 && weatherCode < 800) {
+  // Fog, mist
+  if ([1030, 1135, 1147].includes(weatherCode)) {
     return { recommended: false, reason: "Foggy/misty conditions - reduced visibility and coverage issues" };
   }
   
@@ -219,17 +270,34 @@ export const getSprayRecommendation = (
   };
 };
 
-// Map weather code to appropriate Lucide icon name
+// Map weather code to appropriate Lucide icon name for WeatherAPI.com codes
 export const getWeatherIcon = (code: number) => {
-  // Weather codes: https://www.weatherbit.io/api/codes
-  if (code >= 200 && code < 300) return "CloudLightning"; // Thunderstorm
-  if (code >= 300 && code < 400) return "CloudDrizzle"; // Drizzle
-  if (code >= 500 && code < 600) return "CloudRain"; // Rain
-  if (code >= 600 && code < 700) return "CloudSnow"; // Snow
-  if (code >= 700 && code < 800) return "Cloud"; // Fog/Atmosphere
-  if (code === 800) return "Sun"; // Clear sky
-  if (code > 800 && code < 900) return "CloudSun"; // Clouds
-  return "Cloud"; // Default
+  // Clear or sunny
+  if ([1000].includes(code)) return "Sun";
+  
+  // Partly cloudy
+  if ([1003].includes(code)) return "CloudSun";
+  
+  // Cloudy, overcast
+  if ([1006, 1009].includes(code)) return "Cloud";
+  
+  // Fog, mist
+  if ([1030, 1135, 1147].includes(code)) return "Cloud";
+  
+  // Drizzle, patchy rain
+  if ([1063, 1150, 1153, 1180, 1183, 1240].includes(code)) return "CloudDrizzle";
+  
+  // Rain, heavy rain
+  if ([1186, 1189, 1192, 1195, 1243, 1246].includes(code)) return "CloudRain";
+  
+  // Snow, sleet
+  if ([1066, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258].includes(code)) return "CloudSnow";
+  
+  // Thunderstorm
+  if ([1087, 1273, 1276, 1279, 1282].includes(code)) return "CloudLightning";
+  
+  // Default
+  return "Cloud";
 };
 
 // Format day from datetime string (YYYY-MM-DD)
