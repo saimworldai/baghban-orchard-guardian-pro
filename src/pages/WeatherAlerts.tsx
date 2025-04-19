@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Cloud, Sun, Wind, CloudRain, Thermometer, CloudLightning, 
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import HourlyForecast from '@/components/weather/HourlyForecast';
+import LocationSearch from '@/components/weather/LocationSearch';
 import { 
   getWeatherByCoords, 
   getWeatherByCity, 
@@ -114,6 +114,11 @@ const WeatherAlerts: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLocationSelect = async ({ lat, lon, name }: { lat: number; lon: number; name: string }) => {
+    setLocation(name);
+    await fetchWeatherData(lat, lon);
   };
 
   const handleLocationChange = (value: string) => {
@@ -225,128 +230,100 @@ const WeatherAlerts: React.FC = () => {
           </p>
         </div>
         
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-6">
-          <Button 
-            variant="outline" 
-            className="w-full sm:w-auto flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
-            onClick={getCurrentLocation}
-            disabled={locating || loading}
-          >
-            {locating ? (
-              <Loader className="h-4 w-4 animate-spin" />
-            ) : (
-              <Locate className="h-4 w-4" />
-            )}
-            {locating ? "Getting Location..." : "Use Current Location"}
-          </Button>
-          
-          <div className="relative w-full max-w-md">
-            <Select value={location} onValueChange={handleLocationChange}>
-              <SelectTrigger className="w-full pl-10">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500" size={18} />
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
-              <SelectContent>
-                {locations.map((loc) => (
-                  <SelectItem key={loc} value={loc}>
-                    {loc}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-blue-700"
-            onClick={handleRefresh}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-        
         <Card className="overflow-hidden border border-blue-200 shadow-lg backdrop-blur-sm bg-white/80">
-          <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-600/5 border-b border-blue-100">
-            <CardTitle className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-blue-700">
-                <MapPin className="h-5 w-5" /> 
-                <span>
-                  {currentWeather ? currentWeather.city_name : "Loading location..."}
-                  {currentWeather?.country_code && `, ${currentWeather.country_code}`}
-                </span>
-              </div>
-              <div className="text-sm text-muted-foreground flex items-center gap-1">
-                <Clock className="h-4 w-4" /> 
-                {lastUpdated ? `Updated ${lastUpdated}` : "Updating..."}
-              </div>
-            </CardTitle>
-          </CardHeader>
-          
           <CardContent className="p-6">
-            {loading && !currentWeather ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader className="h-12 w-12 text-blue-500 animate-spin mb-4" />
-                <p className="text-blue-700">Loading weather data...</p>
-              </div>
-            ) : currentWeather && currentWeather.data ? (
-              <>
-                <div className="flex flex-col sm:flex-row items-center justify-between p-6 mb-8 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-100">
-                  {React.createElement(
-                    getIconComponent(currentWeather.data[0].weather.code),
-                    { size: 64, className: "text-blue-500" }
+            <div className="space-y-6">
+              <LocationSearch onLocationSelect={handleLocationSelect} />
+              
+              <div className="flex items-center justify-center gap-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+                  onClick={getCurrentLocation}
+                  disabled={locating || loading}
+                >
+                  {locating ? (
+                    <Loader className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Locate className="h-4 w-4" />
                   )}
+                  {locating ? "Getting Location..." : "Use Current Location"}
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-blue-700"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                >
+                  <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
+
+              {loading && !currentWeather ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader className="h-12 w-12 text-blue-500 animate-spin mb-4" />
+                  <p className="text-blue-700">Loading weather data...</p>
+                </div>
+              ) : currentWeather && currentWeather.data ? (
+                <>
+                  <div className="flex flex-col sm:flex-row items-center justify-between p-6 mb-8 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-100">
+                    {React.createElement(
+                      getIconComponent(currentWeather.data[0].weather.code),
+                      { size: 64, className: "text-blue-500" }
+                    )}
+                    <div>
+                      <p className="text-muted-foreground">Current Temperature</p>
+                      <p className="text-5xl font-bold text-blue-700">
+                        {Math.round(currentWeather.data[0].temp)}°C
+                      </p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {currentWeather.data[0].weather.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {forecast && forecast.data[0].hour && (
+                    <div className="mb-8">
+                      <HourlyForecast hours={forecast.data[0].hour} />
+                    </div>
+                  )}
+
+                  <h2 className="text-xl font-semibold mb-4 text-blue-800">15-Day Forecast & Spray Schedule</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    {renderForecastCards()}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">No Weather Data Available</h3>
+                  <p className="text-muted-foreground">
+                    Please select a location or enable location services to view weather data.
+                  </p>
+                </div>
+              )}
+              
+              <Alert className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-blue-600 mt-1" />
                   <div>
-                    <p className="text-muted-foreground">Current Temperature</p>
-                    <p className="text-5xl font-bold text-blue-700">
-                      {Math.round(currentWeather.data[0].temp)}°C
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {currentWeather.data[0].weather.description}
-                    </p>
+                    <AlertTitle className="text-blue-700 font-semibold mb-2">Spray Schedule Information</AlertTitle>
+                    <AlertDescription className="text-blue-600">
+                      Our spray recommendations are calculated based on comprehensive weather analysis including:
+                      <ul className="list-disc list-inside mt-2 space-y-1">
+                        <li>Temperature and humidity levels</li>
+                        <li>Wind speed and direction</li>
+                        <li>Precipitation probability</li>
+                        <li>Weather conditions and visibility</li>
+                      </ul>
+                      Always follow product-specific guidelines and safety precautions.
+                    </AlertDescription>
                   </div>
                 </div>
-
-                {forecast && forecast.data[0].hour && (
-                  <div className="mb-8">
-                    <HourlyForecast hours={forecast.data[0].hour} />
-                  </div>
-                )}
-
-                <h2 className="text-xl font-semibold mb-4 text-blue-800">15-Day Forecast & Spray Schedule</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                  {renderForecastCards()}
-                </div>
-              </>
-            ) : (
-              <div className="text-center py-8">
-                <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">No Weather Data Available</h3>
-                <p className="text-muted-foreground">
-                  Please select a location or enable location services to view weather data.
-                </p>
-              </div>
-            )}
-            
-            <Alert className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-blue-600 mt-1" />
-                <div>
-                  <AlertTitle className="text-blue-700 font-semibold mb-2">Spray Schedule Information</AlertTitle>
-                  <AlertDescription className="text-blue-600">
-                    Our spray recommendations are calculated based on comprehensive weather analysis including:
-                    <ul className="list-disc list-inside mt-2 space-y-1">
-                      <li>Temperature and humidity levels</li>
-                      <li>Wind speed and direction</li>
-                      <li>Precipitation probability</li>
-                      <li>Weather conditions and visibility</li>
-                    </ul>
-                    Always follow product-specific guidelines and safety precautions.
-                  </AlertDescription>
-                </div>
-              </div>
-            </Alert>
+              </Alert>
+            </div>
           </CardContent>
         </Card>
       </div>
