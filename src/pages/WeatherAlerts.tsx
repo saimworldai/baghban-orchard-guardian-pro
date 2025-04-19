@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { HourlyForecast } from '@/components/weather/HourlyForecast';
+import HourlyForecast from '@/components/weather/HourlyForecast';
 import { 
   getWeatherByCoords, 
   getWeatherByCity, 
