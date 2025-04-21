@@ -60,28 +60,33 @@ export interface ForecastData {
 }
 
 const transformCurrentWeather = (apiData: any): WeatherData => {
-  return {
-    city_name: apiData.location.name,
-    country_code: apiData.location.country,
-    data: [{
-      temp: apiData.current.temp_c,
-      app_temp: apiData.current.feelslike_c,
-      rh: apiData.current.humidity,
-      wind_spd: apiData.current.wind_kph,
-      wind_cdir_full: apiData.current.wind_dir,
-      weather: {
-        icon: apiData.current.condition.icon,
-        description: apiData.current.condition.text,
-        code: apiData.current.condition.code
-      },
-      precip: apiData.current.precip_mm,
-      pop: 0,
-      datetime: apiData.location.localtime,
-      ts: new Date(apiData.location.localtime).getTime() / 1000,
-      pres: apiData.current.pressure_mb,
-      clouds: apiData.current.cloud
-    }]
-  };
+  try {
+    return {
+      city_name: apiData.location.name,
+      country_code: apiData.location.country,
+      data: [{
+        temp: apiData.current.temp_c,
+        app_temp: apiData.current.feelslike_c,
+        rh: apiData.current.humidity,
+        wind_spd: apiData.current.wind_kph,
+        wind_cdir_full: apiData.current.wind_dir,
+        weather: {
+          icon: apiData.current.condition.icon,
+          description: apiData.current.condition.text,
+          code: apiData.current.condition.code
+        },
+        precip: apiData.current.precip_mm,
+        pop: 0,
+        datetime: apiData.location.localtime,
+        ts: new Date(apiData.location.localtime).getTime() / 1000,
+        pres: apiData.current.pressure_mb,
+        clouds: apiData.current.cloud
+      }]
+    };
+  } catch (error) {
+    console.error("Error transforming weather data:", error, apiData);
+    throw new Error("Failed to process weather data");
+  }
 };
 
 const transformForecastData = (apiData: any): ForecastData => {
@@ -122,6 +127,11 @@ const transformForecastData = (apiData: any): ForecastData => {
 export const getWeatherByCoords = async (lat: number, lon: number): Promise<WeatherData | null> => {
   try {
     console.log(`Fetching weather for coordinates: ${lat}, ${lon}`);
+    
+    if (isNaN(lat) || isNaN(lon)) {
+      throw new Error("Invalid coordinates provided");
+    }
+    
     const response = await fetch(
       `${BASE_URL}/current.json?key=${API_KEY}&q=${lat},${lon}&aqi=no`
     );
@@ -139,7 +149,7 @@ export const getWeatherByCoords = async (lat: number, lon: number): Promise<Weat
     console.error("Failed to fetch weather data:", error);
     toast({
       title: "Error",
-      description: "Failed to fetch current weather data. Please try again later.",
+      description: error instanceof Error ? error.message : "Failed to fetch current weather data. Please try again later.",
       variant: "destructive",
     });
     return null;
@@ -148,6 +158,10 @@ export const getWeatherByCoords = async (lat: number, lon: number): Promise<Weat
 
 export const getWeatherByCity = async (city: string): Promise<WeatherData | null> => {
   try {
+    if (!city.trim()) {
+      throw new Error("No location specified");
+    }
+    
     console.log(`Fetching weather for city: ${city}`);
     const response = await fetch(
       `${BASE_URL}/current.json?key=${API_KEY}&q=${encodeURIComponent(city)}&aqi=no`
@@ -156,6 +170,11 @@ export const getWeatherByCity = async (city: string): Promise<WeatherData | null
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Weather API error:", errorData);
+      
+      if (errorData.error && errorData.error.code === 1006) {
+        throw new Error("Location not found. Please check the spelling or try a different location.");
+      }
+      
       throw new Error(`Weather API error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
     }
     
@@ -166,7 +185,7 @@ export const getWeatherByCity = async (city: string): Promise<WeatherData | null
     console.error("Failed to fetch weather data:", error);
     toast({
       title: "Error",
-      description: "Failed to fetch current weather data. Please try again later.",
+      description: error instanceof Error ? error.message : "Failed to fetch current weather data. Please try again later.",
       variant: "destructive",
     });
     return null;
@@ -175,6 +194,10 @@ export const getWeatherByCity = async (city: string): Promise<WeatherData | null
 
 export const getForecastByCoords = async (lat: number, lon: number): Promise<ForecastData | null> => {
   try {
+    if (isNaN(lat) || isNaN(lon)) {
+      throw new Error("Invalid coordinates provided");
+    }
+    
     console.log(`Fetching forecast for coordinates: ${lat}, ${lon}`);
     const response = await fetch(
       `${BASE_URL}/forecast.json?key=${API_KEY}&q=${lat},${lon}&days=15&aqi=no&alerts=no`
@@ -193,7 +216,7 @@ export const getForecastByCoords = async (lat: number, lon: number): Promise<For
     console.error("Failed to fetch forecast data:", error);
     toast({
       title: "Error",
-      description: "Failed to fetch forecast data. Please try again later.",
+      description: error instanceof Error ? error.message : "Failed to fetch forecast data. Please try again later.",
       variant: "destructive",
     });
     return null;
@@ -202,6 +225,10 @@ export const getForecastByCoords = async (lat: number, lon: number): Promise<For
 
 export const getForecastByCity = async (city: string): Promise<ForecastData | null> => {
   try {
+    if (!city.trim()) {
+      throw new Error("No location specified");
+    }
+    
     console.log(`Fetching forecast for city: ${city}`);
     const response = await fetch(
       `${BASE_URL}/forecast.json?key=${API_KEY}&q=${encodeURIComponent(city)}&days=15&aqi=no&alerts=no`
@@ -210,6 +237,11 @@ export const getForecastByCity = async (city: string): Promise<ForecastData | nu
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Weather API error:", errorData);
+      
+      if (errorData.error && errorData.error.code === 1006) {
+        throw new Error("Location not found. Please check the spelling or try a different location.");
+      }
+      
       throw new Error(`Weather API error: ${response.status} - ${errorData.error ? errorData.error.message : 'Unknown error'}`);
     }
     
@@ -220,7 +252,7 @@ export const getForecastByCity = async (city: string): Promise<ForecastData | nu
     console.error("Failed to fetch forecast data:", error);
     toast({
       title: "Error",
-      description: "Failed to fetch forecast data. Please try again later.",
+      description: error instanceof Error ? error.message : "Failed to fetch forecast data. Please try again later.",
       variant: "destructive",
     });
     return null;
@@ -238,11 +270,11 @@ export const getSprayRecommendation = (
     return { recommended: false, reason: "Thunderstorm activity - unsafe for spraying operations" };
   }
   
-  if ([1063, 1150, 1153, 1180, 1183, 1186, 1189, 1192, 1195, 1240, 1243, 1246].includes(weatherCode)) {
+  if ([1063, 1150, 1153, 1180, 1183, 1240].includes(weatherCode)) {
     return { recommended: false, reason: "Rain or drizzle conditions - spraying may be ineffective due to wash-off" };
   }
   
-  if ([1066, 1069, 1072, 1114, 1117, 1147, 1168, 1171, 1198, 1201, 1204, 1207, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258, 1261, 1264].includes(weatherCode)) {
+  if ([1066, 1114, 1117, 1210, 1213, 1216, 1219, 1222, 1225, 1255, 1258].includes(weatherCode)) {
     return { recommended: false, reason: "Snow or freezing conditions - postpone spraying until temperatures rise" };
   }
   

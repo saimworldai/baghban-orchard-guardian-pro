@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Cloud, Sun, Wind, CloudRain, Thermometer, CloudLightning, 
   MapPin, ArrowUpDown, Umbrella, Clock, Droplet, AlertTriangle, 
@@ -7,7 +8,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
 import HourlyForecast from '@/components/weather/HourlyForecast';
 import LocationSearch from '@/components/weather/LocationSearch';
@@ -30,51 +30,11 @@ const WeatherAlerts: React.FC = () => {
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [updateInterval, setUpdateInterval] = useState<NodeJS.Timeout | null>(null);
 
-  const locations = [
-    'Kashmir Orchard', 
-    'Himachal Apple Farm', 
-    'Uttarakhand Highlands', 
-    'Kinnaur Valley',
-    'Srinagar',
-    'Shimla',
-    'Dehradun',
-    'Manali'
-  ];
-
-  const getCurrentLocation = () => {
-    setLocating(true);
-    
-    if (!navigator.geolocation) {
-      toast({
-        title: "Error",
-        description: "Geolocation is not supported by your browser",
-        variant: "destructive",
-      });
-      setLocating(false);
-      return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        fetchWeatherData(latitude, longitude);
-        setLocating(false);
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        toast({
-          title: "Location Error",
-          description: "Unable to get your current location. Please try selecting a location manually.",
-          variant: "destructive",
-        });
-        setLocating(false);
-      },
-      { timeout: 10000 }
-    );
-  };
-
-  const fetchWeatherData = async (lat?: number, lon?: number) => {
+  // Memoize the fetchWeatherData function to use in useEffect without causing loops
+  const fetchWeatherData = useCallback(async (lat?: number, lon?: number) => {
     setLoading(true);
     try {
       let weatherData;
@@ -108,22 +68,49 @@ const WeatherAlerts: React.FC = () => {
       console.error("Error fetching weather data:", error);
       toast({
         title: "Error",
-        description: "Failed to fetch weather data. Please try again later.",
+        description: error instanceof Error ? error.message : "Failed to fetch weather data. Please try again later.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [location]);
 
   const handleLocationSelect = async ({ lat, lon, name }: { lat: number; lon: number; name: string }) => {
     setLocation(name);
     await fetchWeatherData(lat, lon);
   };
 
-  const handleLocationChange = (value: string) => {
-    setLocation(value);
-    fetchWeatherData();
+  const getCurrentLocation = () => {
+    setLocating(true);
+    
+    if (!navigator.geolocation) {
+      toast({
+        title: "Error",
+        description: "Geolocation is not supported by your browser",
+        variant: "destructive",
+      });
+      setLocating(false);
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        fetchWeatherData(latitude, longitude);
+        setLocating(false);
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        toast({
+          title: "Location Error",
+          description: "Unable to get your current location. Please try selecting a location manually.",
+          variant: "destructive",
+        });
+        setLocating(false);
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
   };
 
   const handleRefresh = () => {
@@ -133,6 +120,53 @@ const WeatherAlerts: React.FC = () => {
       getCurrentLocation();
     }
   };
+
+  const toggleAutoRefresh = () => {
+    if (!autoRefresh) {
+      // Start auto-refresh every 10 minutes
+      const interval = setInterval(() => {
+        handleRefresh();
+        toast({
+          title: "Auto Refresh",
+          description: "Weather data has been automatically updated",
+        });
+      }, 10 * 60 * 1000); // 10 minutes in milliseconds
+      
+      setUpdateInterval(interval);
+      setAutoRefresh(true);
+      
+      toast({
+        title: "Auto Refresh Enabled",
+        description: "Weather data will automatically update every 10 minutes",
+      });
+    } else {
+      // Stop auto-refresh
+      if (updateInterval) {
+        clearInterval(updateInterval);
+        setUpdateInterval(null);
+      }
+      setAutoRefresh(false);
+      
+      toast({
+        title: "Auto Refresh Disabled",
+        description: "Automatic weather updates have been turned off",
+      });
+    }
+  };
+
+  // Clean up interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+    };
+  }, [updateInterval]);
+
+  // Get initial location when component mounts
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
 
   const getIconComponent = (code: number) => {
     const iconName = getWeatherIcon(code);
@@ -148,10 +182,6 @@ const WeatherAlerts: React.FC = () => {
       default: return Cloud;
     }
   };
-
-  useEffect(() => {
-    getCurrentLocation();
-  }, []);
 
   const renderForecastCards = () => {
     if (!forecast) return null;
@@ -235,10 +265,10 @@ const WeatherAlerts: React.FC = () => {
             <div className="space-y-6">
               <LocationSearch onLocationSelect={handleLocationSelect} />
               
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 <Button 
                   variant="outline" 
-                  className="w-full sm:w-auto flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+                  className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
                   onClick={getCurrentLocation}
                   disabled={locating || loading}
                 >
@@ -251,6 +281,15 @@ const WeatherAlerts: React.FC = () => {
                 </Button>
                 
                 <Button 
+                  variant={autoRefresh ? "default" : "outline"}
+                  className={`flex items-center gap-2 ${autoRefresh ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-200 text-blue-700 hover:bg-blue-50'}`}
+                  onClick={toggleAutoRefresh}
+                >
+                  <Clock className="h-4 w-4" />
+                  {autoRefresh ? "Auto-Refresh On" : "Auto-Refresh Off"}
+                </Button>
+                
+                <Button 
                   variant="ghost" 
                   size="icon" 
                   className="text-blue-700"
@@ -259,6 +298,12 @@ const WeatherAlerts: React.FC = () => {
                 >
                   <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
                 </Button>
+                
+                {lastUpdated && (
+                  <span className="text-xs text-muted-foreground">
+                    Last updated: {lastUpdated}
+                  </span>
+                )}
               </div>
 
               {loading && !currentWeather ? (
@@ -273,14 +318,45 @@ const WeatherAlerts: React.FC = () => {
                       getIconComponent(currentWeather.data[0].weather.code),
                       { size: 64, className: "text-blue-500" }
                     )}
-                    <div>
-                      <p className="text-muted-foreground">Current Temperature</p>
-                      <p className="text-5xl font-bold text-blue-700">
+                    <div className="text-center sm:text-left">
+                      <h2 className="text-xl font-bold text-blue-800">{currentWeather.city_name}</h2>
+                      <p className="text-muted-foreground">{currentWeather.country_code}</p>
+                      <p className="text-5xl font-bold text-blue-700 mt-2">
                         {Math.round(currentWeather.data[0].temp)}°C
                       </p>
                       <p className="text-sm text-gray-600 mt-1">
                         {currentWeather.data[0].weather.description}
                       </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-4 sm:mt-0">
+                      <div className="flex flex-col items-center">
+                        <div className="flex items-center text-blue-600">
+                          <Thermometer className="h-4 w-4 mr-1" />
+                          <span className="text-sm">Feels like</span>
+                        </div>
+                        <span className="font-semibold">{Math.round(currentWeather.data[0].app_temp)}°C</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <div className="flex items-center text-blue-600">
+                          <Wind className="h-4 w-4 mr-1" />
+                          <span className="text-sm">Wind</span>
+                        </div>
+                        <span className="font-semibold">{Math.round(currentWeather.data[0].wind_spd)} km/h</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <div className="flex items-center text-blue-600">
+                          <Droplet className="h-4 w-4 mr-1" />
+                          <span className="text-sm">Humidity</span>
+                        </div>
+                        <span className="font-semibold">{currentWeather.data[0].rh}%</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <div className="flex items-center text-blue-600">
+                          <CloudRain className="h-4 w-4 mr-1" />
+                          <span className="text-sm">Precip</span>
+                        </div>
+                        <span className="font-semibold">{currentWeather.data[0].precip} mm</span>
+                      </div>
                     </div>
                   </div>
 
