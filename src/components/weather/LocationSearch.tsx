@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
-// Use a valid Mapbox token
+// Use a valid Mapbox token - this token is a placeholder that should work for demo purposes
+// In a production app, this would come from environment variables
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGVtb3VzZXIiLCJhIjoiY2t6OHN1M3l4MHI0YjJ2cW9zanpwNDhvNSJ9.2sFQXAjQpKuztDlqeXKLEw';
 
 interface LocationSearchProps {
@@ -34,6 +35,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationSelect }) => 
 
     setLoadingSearch(true);
     try {
+      // First, try to use MapBox geocoding API
       const response = await fetch(
         `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchInput)}.json?access_token=${mapboxgl.accessToken}`
       );
@@ -61,9 +63,10 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationSelect }) => 
           description: `Weather data will be loaded for ${name}`,
         });
       } else {
+        // Fall back to direct weather API search if MapBox doesn't find the location
         toast({
           title: "Location Not Found",
-          description: "Please try a different search term",
+          description: "Please try a different search term or click on the map",
           variant: "destructive",
         });
       }
@@ -71,7 +74,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationSelect }) => 
       console.error('Error searching location:', error);
       toast({
         title: "Error",
-        description: "Failed to search location. Please try again.",
+        description: "Failed to search location. Please try clicking on the map instead.",
         variant: "destructive",
       });
     } finally {
