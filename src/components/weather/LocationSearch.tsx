@@ -1,6 +1,4 @@
 
-// REFACTORED: Orchestrates state, imports modular blocks for input, map, and hook logic
-
 import React, { useRef, useState, useCallback } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { LocationSearchInput } from './LocationSearchInput';
