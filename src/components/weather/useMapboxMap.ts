@@ -6,7 +6,7 @@ type UseMapboxMapProps = {
   containerRef: React.RefObject<HTMLDivElement>;
   showMap: boolean;
   onLocationSelect: (location: { lat: number; lon: number; name: string }) => void;
-  toast: (params: { title: string; description: string; variant?: string }) => void;
+  toast: (params: { title: string; description: string; variant?: "default" | "destructive" | undefined }) => void;
 };
 
 export function useMapboxMap({ containerRef, showMap, onLocationSelect, toast }: UseMapboxMapProps) {

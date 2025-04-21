@@ -18,7 +18,18 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationSelect }) => 
   const mapContainer = useRef<HTMLDivElement>(null);
 
   // Use mapbox logic encapsulated in hook
-  useMapboxMap({ containerRef: mapContainer, showMap, onLocationSelect, toast });
+  useMapboxMap({ 
+    containerRef: mapContainer, 
+    showMap, 
+    onLocationSelect, 
+    toast: (params) => {
+      toast({
+        title: params.title,
+        description: params.description,
+        variant: params.variant as "default" | "destructive" | undefined
+      });
+    }
+  });
 
   const searchLocation = useCallback(async () => {
     if (!searchInput.trim()) {
@@ -43,9 +54,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onLocationSelect }) => 
         const [lon, lat] = data.features[0].center;
         const name = data.features[0].place_name;
         onLocationSelect({ lat, lon, name });
-
-        // Try moving the map and marker (if map is visible)
-        // Find the marker on the page and update position if necessary (optional for advanced UX)
 
         toast({
           title: "Location Found",

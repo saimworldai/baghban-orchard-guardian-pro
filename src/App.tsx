@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import DiseaseDetection from "./pages/DiseaseDetection";
 import WeatherAlerts from "./pages/WeatherAlerts";
+import SpraySchedule from "./pages/SpraySchedule";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/disease-detection" element={<DiseaseDetection />} />
             <Route path="/weather-alerts" element={<WeatherAlerts />} />
+            <Route path="/spray-schedule" element={<SpraySchedule />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
