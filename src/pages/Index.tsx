@@ -55,7 +55,7 @@ const features = [
     description: 'Connect with agriculture experts for personalized guidance and advice',
     color: 'from-purple-500/20 to-violet-500/20',
     textColor: 'text-purple-700',
-    link: '#'
+    link: '/expert-consultation'
   },
   { 
     name: 'Shop', 
