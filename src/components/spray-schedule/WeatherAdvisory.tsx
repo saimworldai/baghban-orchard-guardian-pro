@@ -6,7 +6,8 @@ import {
   Thermometer, 
   Sun, 
   AlertTriangle, 
-  Check
+  Check,
+  Calendar
 } from 'lucide-react';
 import {
   Card,
@@ -14,15 +15,24 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { WeatherData, getSprayRecommendation } from '@/services/weatherService';
+import { format, addDays } from 'date-fns';
 
 type WeatherAdvisoryProps = {
   weather: WeatherData | null;
   isLoading: boolean;
+  onSchedule?: (date: Date) => void;
 };
 
-export const WeatherAdvisory: React.FC<WeatherAdvisoryProps> = ({ weather, isLoading }) => {
+export const WeatherAdvisory: React.FC<WeatherAdvisoryProps> = ({ 
+  weather, 
+  isLoading,
+  onSchedule 
+}) => {
   if (isLoading) {
     return (
       <Card>
@@ -62,6 +72,15 @@ export const WeatherAdvisory: React.FC<WeatherAdvisoryProps> = ({ weather, isLoa
     currentWeather.rh,
     currentWeather.temp
   );
+
+  // Generate a 5-day forecast for spray suitability (mock data)
+  const sprayForecast = [
+    { date: new Date(), suitable: recommendation.recommended, reason: recommendation.reason, time: '6:00 AM - 9:00 AM' },
+    { date: addDays(new Date(), 1), suitable: true, reason: 'Low wind, no precipitation', time: '6:00 AM - 10:00 AM' },
+    { date: addDays(new Date(), 2), suitable: false, reason: 'High wind speeds forecast', time: 'Not recommended' },
+    { date: addDays(new Date(), 3), suitable: false, reason: 'Rain forecast', time: 'Not recommended' },
+    { date: addDays(new Date(), 4), suitable: true, reason: 'Ideal conditions', time: '5:00 AM - 11:00 AM' },
+  ];
 
   return (
     <Card>
@@ -113,7 +132,46 @@ export const WeatherAdvisory: React.FC<WeatherAdvisoryProps> = ({ weather, isLoa
             <p className="text-sm">{recommendation.reason}</p>
           </div>
         </div>
+        
+        <div className="mt-6">
+          <h4 className="font-medium mb-3">5-Day Spray Window Forecast</h4>
+          <div className="space-y-3">
+            {sprayForecast.map((day, index) => (
+              <div 
+                key={index}
+                className={`flex justify-between items-center p-3 rounded-md ${
+                  day.suitable 
+                    ? 'bg-green-50 text-green-800 border border-green-100' 
+                    : 'bg-muted/10 text-muted-foreground border border-muted/20'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5" />
+                  <div>
+                    <h5 className="font-medium">{format(day.date, 'EEE, MMM d')}</h5>
+                    <p className="text-sm">{day.suitable ? day.time : day.reason}</p>
+                  </div>
+                </div>
+                {day.suitable && onSchedule && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="text-xs h-7"
+                    onClick={() => onSchedule(day.date)}
+                  >
+                    Schedule
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       </CardContent>
+      <CardFooter>
+        <div className="w-full text-center text-sm text-muted-foreground">
+          Data updated {format(new Date(), 'MMM d, h:mm a')}
+        </div>
+      </CardFooter>
     </Card>
   );
 };

@@ -39,7 +39,7 @@ const features = [
     description: 'Smart spray scheduling system based on disease risk and weather conditions',
     color: 'from-green-500/20 to-emerald-500/20',
     textColor: 'text-green-700',
-    link: '#'
+    link: '/spray-schedule'
   },
   { 
     name: 'Knowledge Hub', 
