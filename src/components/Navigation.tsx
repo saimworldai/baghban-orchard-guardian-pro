@@ -1,4 +1,3 @@
-
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthProvider';
@@ -28,6 +27,13 @@ const Navigation = () => {
             <Button variant="ghost" size="sm" className="hidden md:flex gap-1">
               <Home className="h-4 w-4" />
               Home
+            </Button>
+          </Link>
+
+          <Link to="/expert-consultation">
+            <Button variant="ghost" size="sm" className="hidden md:flex gap-1">
+              <UserCheck className="h-4 w-4" />
+              Expert Consultation
             </Button>
           </Link>
 
