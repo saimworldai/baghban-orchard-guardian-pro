@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar } from '@/components/ui/calendar';
@@ -33,7 +32,6 @@ const SpraySchedule = () => {
   const [activeTab, setActiveTab] = useState('calendar');
   const { location, setLocation } = useLocationState();
   
-  // Fetch current weather data for spray recommendations
   const { data: weatherData, isLoading: weatherLoading } = useQuery({
     queryKey: ['weather', location?.lat, location?.lon],
     queryFn: () => location ? getWeatherByCoords(location.lat, location.lon) : null,
@@ -59,7 +57,6 @@ const SpraySchedule = () => {
     setShowSprayForm(true);
   };
 
-  // Check for network status (for offline functionality demo)
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   
   useEffect(() => {
@@ -90,12 +87,23 @@ const SpraySchedule = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Smart Spray Schedule</h1>
-      
-      {/* Network Status Indicator */}
+    <div className="container mx-auto p-4 space-y-6 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          Smart Spray Schedule
+        </h1>
+        <Button 
+          variant="outline"
+          onClick={() => setShowSprayForm(true)}
+          className="bg-white hover:bg-purple-50 border-purple-200"
+        >
+          <Plus className="mr-2 h-4 w-4 text-purple-600" />
+          Add Spray Task
+        </Button>
+      </div>
+
       {!isOnline && (
-        <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-center gap-3">
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-4 rounded-lg flex items-center gap-3 shadow-sm">
           <AlertTriangle className="h-5 w-5 text-amber-600" />
           <div>
             <h3 className="font-medium text-amber-800">Offline Mode</h3>
@@ -103,159 +111,85 @@ const SpraySchedule = () => {
           </div>
         </div>
       )}
-      
-      {/* Location Selector */}
-      <div className="bg-card rounded-lg p-4 shadow">
-        <h2 className="text-lg font-medium mb-2">Orchard Location</h2>
+
+      <div className="bg-white rounded-lg p-6 shadow-lg border border-purple-100">
+        <h2 className="text-lg font-medium mb-4 text-gray-800">Orchard Location</h2>
         <LocationSearch onLocationSelect={handleLocationSelect} />
       </div>
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="calendar">Calendar</TabsTrigger>
-          <TabsTrigger value="list">Task List</TabsTrigger>
-          <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-white">
+          <TabsTrigger value="calendar" className="data-[state=active]:bg-purple-100">Calendar</TabsTrigger>
+          <TabsTrigger value="list" className="data-[state=active]:bg-purple-100">Task List</TabsTrigger>
+          <TabsTrigger value="recommendations" className="data-[state=active]:bg-purple-100">Recommendations</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="calendar" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium">Spray Calendar</h2>
-            <Button onClick={() => {
-              setEditTaskId(undefined);
-              setShowSprayForm(true);
-            }}>
-              <Plus className="mr-2 h-4 w-4" /> Add Spray Task
-            </Button>
-          </div>
-          
-          <div className="bg-card p-4 rounded-lg shadow">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-md border"
-            />
-          </div>
-          
-          <div className="bg-card p-4 rounded-lg shadow">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-medium">
-                Tasks for {format(selectedDate, 'MMMM d, yyyy')}
-              </h3>
-              <Button 
-                size="sm" 
-                variant="outline"
-                onClick={() => handleScheduleOnDay(selectedDate)}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Add for this day
-              </Button>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={(date) => date && setSelectedDate(date)}
+                className="rounded-md"
+              />
             </div>
-            <SprayScheduleList 
-              date={selectedDate}
-              onEditTask={handleEditTask}
-            />
+
+            <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-medium text-gray-800">
+                  Tasks for {format(selectedDate, 'MMMM d, yyyy')}
+                </h3>
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  onClick={() => handleScheduleOnDay(selectedDate)}
+                  className="bg-white hover:bg-purple-50 border-purple-200"
+                >
+                  <Plus className="h-3 w-3 mr-1" /> Add for this day
+                </Button>
+              </div>
+              <SprayScheduleList 
+                date={selectedDate}
+                onEditTask={handleEditTask}
+              />
+            </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="list" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-medium">All Spray Tasks</h2>
-            <Button onClick={() => {
-              setEditTaskId(undefined);
-              setShowSprayForm(true);
-            }}>
-              <Plus className="mr-2 h-4 w-4" /> Add Spray Task
-            </Button>
-          </div>
-          
-          <div className="flex justify-between items-center">
-            <div className="flex gap-2">
-              <Badge variant="outline" className="cursor-pointer">All</Badge>
-              <Badge variant="outline" className="cursor-pointer">Upcoming</Badge>
-              <Badge variant="outline" className="cursor-pointer">Completed</Badge>
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-100">
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex gap-2">
+                <Badge variant="outline" className="cursor-pointer hover:bg-purple-50">All</Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-purple-50">Upcoming</Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-purple-50">Completed</Badge>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="flex items-center gap-1">
+                  <Download className="h-4 w-4" /> Export
+                </Button>
+                <Button size="sm" variant="outline" className="flex items-center gap-1">
+                  <Share className="h-4 w-4" /> Share
+                </Button>
+              </div>
             </div>
             
-            <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="flex items-center gap-1">
-                <Download className="h-4 w-4" /> Export
-              </Button>
-              <Button size="sm" variant="outline" className="flex items-center gap-1">
-                <Share className="h-4 w-4" /> Share
-              </Button>
-            </div>
-          </div>
-          
-          <Card className="p-4">
             <SprayScheduleList onEditTask={handleEditTask} />
-          </Card>
+          </div>
         </TabsContent>
-        
+
         <TabsContent value="recommendations" className="space-y-4">
-          <h2 className="text-lg font-medium">Smart Recommendations</h2>
-          
-          {/* Weather Advisory */}
           <WeatherAdvisory 
             weather={weatherData} 
             isLoading={weatherLoading} 
             onSchedule={handleScheduleOnDay}
           />
-          
-          {/* Spray Recommendations */}
           <SprayRecommendations weather={weatherData} />
-          
-          {/* Analytics Summary */}
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50">
-            <h3 className="text-lg font-medium mb-3">Spray Analysis</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-3 rounded-md shadow-sm">
-                <h4 className="text-sm font-medium text-muted-foreground mb-1">This Month</h4>
-                <div className="flex justify-between items-end">
-                  <div className="text-2xl font-bold">4 Sprays</div>
-                  <div className="text-green-600 text-sm">↓ 12%</div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Reduced sprays compared to last month
-                </p>
-              </div>
-              
-              <div className="bg-white p-3 rounded-md shadow-sm">
-                <h4 className="text-sm font-medium text-muted-foreground mb-1">Chemical Usage</h4>
-                <div className="flex justify-between items-end">
-                  <div className="text-2xl font-bold">2.3 kg</div>
-                  <div className="text-green-600 text-sm">↓ 18%</div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Better targeting reduced chemical use
-                </p>
-              </div>
-              
-              <div className="bg-white p-3 rounded-md shadow-sm">
-                <h4 className="text-sm font-medium text-muted-foreground mb-1">Cost Savings</h4>
-                <div className="flex justify-between items-end">
-                  <div className="text-2xl font-bold">₹2,400</div>
-                  <div className="text-green-600 text-sm">↑ 15%</div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Optimized spray schedule saved costs
-                </p>
-              </div>
-              
-              <div className="bg-white p-3 rounded-md shadow-sm">
-                <h4 className="text-sm font-medium text-muted-foreground mb-1">Disease Control</h4>
-                <div className="flex justify-between items-end">
-                  <div className="text-2xl font-bold">92%</div>
-                  <div className="text-green-600 text-sm">↑ 7%</div>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Improved effectiveness rate
-                </p>
-              </div>
-            </div>
-          </Card>
         </TabsContent>
       </Tabs>
-      
-      {/* Spray Task Form Modal */}
+
       {showSprayForm && (
         <SprayForm 
           selectedDate={selectedDate} 

@@ -33,17 +33,17 @@ export const SprayRecommendations: React.FC<SprayRecommendationsProps> = ({ weat
   
   return (
     <div className="space-y-4">
-      <Card>
+      <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-100">
         <CardHeader>
-          <CardTitle className="text-lg">Seasonal Recommendations</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg text-green-800">Seasonal Recommendations</CardTitle>
+          <CardDescription className="text-green-700">
             Recommended spray schedule for {appleVariety} in {currentSeason} ({growthStage})
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="hover:bg-green-50/50">
                 <TableHead>Disease/Pest</TableHead>
                 <TableHead>Severity</TableHead>
                 <TableHead>Recommended Treatment</TableHead>
@@ -52,7 +52,7 @@ export const SprayRecommendations: React.FC<SprayRecommendationsProps> = ({ weat
             </TableHeader>
             <TableBody>
               {diseaseDatabase.map((disease) => (
-                <TableRow key={disease.disease}>
+                <TableRow key={disease.disease} className="hover:bg-green-50/50">
                   <TableCell className="font-medium">{disease.disease}</TableCell>
                   <TableCell>
                     <Badge variant={
@@ -66,7 +66,7 @@ export const SprayRecommendations: React.FC<SprayRecommendationsProps> = ({ weat
                     {disease.treatment}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" className="hover:bg-green-50">
                       <Plus className="h-4 w-4 mr-1" /> Schedule
                     </Button>
                   </TableCell>
@@ -77,21 +77,21 @@ export const SprayRecommendations: React.FC<SprayRecommendationsProps> = ({ weat
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-100">
         <CardHeader>
-          <CardTitle className="text-lg">Optimal Spray Windows</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-lg text-blue-800">Optimal Spray Windows</CardTitle>
+          <CardDescription className="text-blue-700">
             Weather-based recommendations for the next 7 days
           </CardDescription>
         </CardHeader>
         <CardContent>
           {!weather ? (
-            <div className="text-center p-4 text-muted-foreground">
+            <div className="text-center p-4 text-blue-600">
               Select a location to view optimal spray windows
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center p-3 bg-green-50 text-green-800 rounded-md">
+              <div className="flex items-center p-3 bg-green-100/50 text-green-800 rounded-md">
                 <div className="w-4 h-full bg-green-500 rounded-full mr-3"></div>
                 <div>
                   <h4 className="font-medium">Tomorrow Morning (6-9 AM)</h4>
@@ -99,7 +99,7 @@ export const SprayRecommendations: React.FC<SprayRecommendationsProps> = ({ weat
                 </div>
               </div>
               
-              <div className="flex items-center p-3 bg-amber-50 text-amber-800 rounded-md">
+              <div className="flex items-center p-3 bg-amber-100/50 text-amber-800 rounded-md">
                 <div className="w-4 h-full bg-amber-500 rounded-full mr-3"></div>
                 <div>
                   <h4 className="font-medium">Day After Tomorrow (4-7 PM)</h4>
@@ -107,7 +107,7 @@ export const SprayRecommendations: React.FC<SprayRecommendationsProps> = ({ weat
                 </div>
               </div>
               
-              <div className="flex items-center p-3 bg-red-50 text-red-800 rounded-md">
+              <div className="flex items-center p-3 bg-red-100/50 text-red-800 rounded-md">
                 <div className="w-4 h-full bg-red-500 rounded-full mr-3"></div>
                 <div>
                   <h4 className="font-medium">Next 3 Days</h4>
