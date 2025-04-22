@@ -142,9 +142,8 @@ const SpraySchedule = () => {
                 </h3>
                 <Button 
                   size="sm" 
-                  variant="outline"
                   onClick={() => handleScheduleOnDay(selectedDate)}
-                  className="bg-white hover:bg-purple-50 border-purple-200"
+                  className="bg-green-600 hover:bg-green-700 text-white"
                 >
                   <Plus className="h-3 w-3 mr-1" /> Add for this day
                 </Button>

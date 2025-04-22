@@ -28,6 +28,19 @@ export const mockSprayTasks = [
     reminder: '12h',
     offlineSync: true
   }
-] as const;
+] as SprayTask[];
 
-export type SprayTask = typeof mockSprayTasks[number];
+export type SprayTask = {
+  id: string;
+  pesticide: string;
+  diseaseTarget: string;
+  scheduledDate: string;
+  dose: string;
+  completed: boolean;
+  completedDate: string | null;
+  priority: 'low' | 'medium' | 'high';
+  notes: string;
+  weatherRisk: string;
+  reminder: string;
+  offlineSync: boolean;
+};

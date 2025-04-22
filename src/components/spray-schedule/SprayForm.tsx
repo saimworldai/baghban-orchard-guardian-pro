@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon, X, Check, AlertTriangle } from 'lucide-react';
@@ -50,14 +49,12 @@ export const SprayForm: React.FC<SprayFormProps> = ({ selectedDate, editTaskId, 
   const [useVoiceInput, setUseVoiceInput] = useState(false);
   const [language, setLanguage] = useState('english');
   
-  // Check if there's weather risk for the selected date
   const hasWeatherRisk = false; // Normally would check with weather API
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate required fields
-    if (!product.trim() || !dose.trim() || !target) {
+    if (!pesticide.trim() || !dose.trim() || !target) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields",
@@ -66,18 +63,22 @@ export const SprayForm: React.FC<SprayFormProps> = ({ selectedDate, editTaskId, 
       return;
     }
     
-    // In a real app, this would save to a database
-    console.log('Form submitted', {
-      date,
+    const newTask = {
+      id: editTaskId || Math.random().toString(36).substr(2, 9),
       pesticide,
-      product,
+      diseaseTarget: target,
+      scheduledDate: date.toISOString(),
       dose,
+      completed: false,
+      completedDate: null,
       priority,
-      target,
       notes,
+      weatherRisk: hasWeatherRisk ? 'Weather risk detected' : '',
       reminder,
-      weatherAware
-    });
+      offlineSync: !navigator.onLine
+    };
+    
+    console.log('Saving task:', newTask);
     
     toast({
       title: editTaskId ? "Spray task updated" : "Spray task scheduled",
@@ -87,7 +88,6 @@ export const SprayForm: React.FC<SprayFormProps> = ({ selectedDate, editTaskId, 
     onClose();
   };
   
-  // AI-based recommendation (mock)
   const aiRecommendation = {
     dose: target === 'apple_scab' ? '2.5 g/L' : '3.0 g/L',
     product: target === 'apple_scab' ? 'Mancozeb' : 
@@ -117,7 +117,6 @@ export const SprayForm: React.FC<SprayFormProps> = ({ selectedDate, editTaskId, 
         
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            {/* Language Selection */}
             <div className="grid gap-2">
               <Label htmlFor="language">Language / भाषा / زبان</Label>
               <Select value={language} onValueChange={setLanguage}>
@@ -133,7 +132,6 @@ export const SprayForm: React.FC<SprayFormProps> = ({ selectedDate, editTaskId, 
               </Select>
             </div>
             
-            {/* Voice Input Option */}
             <div className="flex items-center justify-between">
               <Label htmlFor="voice-input">Voice Input</Label>
               <Switch 
@@ -332,11 +330,13 @@ export const SprayForm: React.FC<SprayFormProps> = ({ selectedDate, editTaskId, 
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Save Task</Button>
+            <Button type="submit" className="bg-green-600 hover:bg-green-700">
+              {editTaskId ? 'Save Changes' : 'Schedule Task'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
