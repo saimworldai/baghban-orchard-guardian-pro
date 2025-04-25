@@ -1,29 +1,38 @@
-
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { useUserRole } from '@/hooks/useUserRole';
+import { ConsultantDashboard } from '@/components/expert-consultation';
+import { VideoCall, ExpertsList, ConsultationHistory, ScheduleConsultation, AskQuestion } from "@/components/expert-consultation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import {
-  VideoCall,
-  ExpertsList,
-  ConsultationHistory,
-  ScheduleConsultation,
-  AskQuestion
-} from "@/components/expert-consultation";
-import {
-  Video,
-  MessageSquare,
-  Calendar,
-  Star,
-  Clock,
-  Bell,
-  ShieldCheck,
-  Download
-} from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthProvider';
 
 export default function ExpertConsultation() {
-  const [activeTab, setActiveTab] = useState('experts');
+  const { role, loading } = useUserRole();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
+  // Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (!user && !loading) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (role === 'consultant' || role === 'admin') {
+    return (
+      <div className="container mx-auto p-4 space-y-6">
+        <h1 className="text-3xl font-bold text-green-800 mb-6">Consultant Dashboard</h1>
+        <ConsultantDashboard />
+      </div>
+    );
+  }
+
+  // Farmer view (default)
   return (
     <div className="container mx-auto p-4 space-y-6">
       {/* Header Section */}
@@ -46,7 +55,7 @@ export default function ExpertConsultation() {
       </div>
 
       {/* Main Content */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value="experts" className="space-y-4">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2 bg-green-50/50">
           <TabsTrigger value="experts" className="data-[state=active]:bg-green-100">
             <Star className="mr-2 h-4 w-4" />
@@ -66,19 +75,19 @@ export default function ExpertConsultation() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="experts" className="space-y-4">
+        <TabsContent value="experts">
           <ExpertsList />
         </TabsContent>
 
-        <TabsContent value="video" className="space-y-4">
+        <TabsContent value="video">
           <VideoCall />
         </TabsContent>
 
-        <TabsContent value="chat" className="space-y-4">
+        <TabsContent value="chat">
           <AskQuestion />
         </TabsContent>
 
-        <TabsContent value="schedule" className="space-y-4">
+        <TabsContent value="schedule">
           <ScheduleConsultation />
         </TabsContent>
       </Tabs>
