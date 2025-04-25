@@ -19,17 +19,19 @@ export function useUserRole() {
       }
 
       try {
-        const { data, error } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
           .single();
 
-        if (error) throw error;
-        setRole(data.role as UserRole);
+        if (profileError) throw profileError;
+        
+        // Default to 'farmer' if no role is set
+        setRole((profileData?.role as UserRole) || 'farmer');
       } catch (error) {
         console.error('Error fetching user role:', error);
-        setRole(null);
+        setRole('farmer'); // Default to farmer role on error
       } finally {
         setLoading(false);
       }

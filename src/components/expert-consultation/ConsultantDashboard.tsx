@@ -16,6 +16,21 @@ import {
 import { toast } from "@/components/ui/sonner";
 import { useNavigate } from 'react-router-dom';
 
+interface Consultation {
+  id: string;
+  farmer_id: string;
+  consultant_id: string | null;
+  status: 'pending' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  topic: string;
+  created_at: string;
+  farmer: {
+    email: string;
+    profiles: {
+      full_name: string;
+    } | null;
+  };
+}
+
 export function ConsultantDashboard() {
   const navigate = useNavigate();
 
@@ -27,12 +42,10 @@ export function ConsultantDashboard() {
         .select(`
           *,
           farmer:farmer_id(
-            id,
             email,
-            profiles:profiles(full_name)
+            profiles(full_name)
           )
-        `)
-        .order('created_at', { ascending: false });
+        `) as unknown as { data: Consultation[] | null, error: Error | null };
 
       if (error) throw error;
       return data;
@@ -85,11 +98,11 @@ export function ConsultantDashboard() {
             {consultations?.map((consultation) => (
               <TableRow key={consultation.id}>
                 <TableCell>
-                  {consultation.farmer?.profiles?.full_name || consultation.farmer?.email}
+                  {consultation.farmer?.profiles?.full_name || consultation.farmer.email}
                 </TableCell>
                 <TableCell>{consultation.topic}</TableCell>
                 <TableCell>
-                  <Badge variant={consultation.status === 'pending' ? 'warning' : 'success'}>
+                  <Badge variant="outline" className={consultation.status === 'pending' ? 'bg-yellow-50 text-yellow-700' : 'bg-green-50 text-green-700'}>
                     {consultation.status}
                   </Badge>
                 </TableCell>
