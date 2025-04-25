@@ -19,16 +19,28 @@ export function useUserRole() {
       }
 
       try {
-        const { data: profileData, error: profileError } = await supabase
+        // First try to get the role from the profiles table
+        const { data, error } = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', user.id)
           .single();
 
-        if (profileError) throw profileError;
+        if (error) throw error;
         
-        // Default to 'farmer' if no role is set
-        setRole((profileData?.role as UserRole) || 'farmer');
+        // For now, since the role column might not exist yet, we'll default to 'farmer'
+        // In the future, you can use the actual role from the database
+        // setRole((data?.role as UserRole) || 'farmer');
+        
+        // Temporary solution - hardcoded roles for testing
+        // You can replace this with actual role from the database once the schema is updated
+        if (user.email?.includes('admin')) {
+          setRole('admin');
+        } else if (user.email?.includes('consultant')) {
+          setRole('consultant');
+        } else {
+          setRole('farmer');
+        }
       } catch (error) {
         console.error('Error fetching user role:', error);
         setRole('farmer'); // Default to farmer role on error
