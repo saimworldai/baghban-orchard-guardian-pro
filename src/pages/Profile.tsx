@@ -36,16 +36,18 @@ const Profile = () => {
         }
 
         const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
           .single();
         
         if (error) throw error;
         
-        setProfile(data);
-        setFullName(data.full_name || "");
-        setLocation(data.location || "");
+        if (data) {
+          setProfile(data);
+          setFullName(data.full_name || "");
+          setLocation(data.location || "");
+        }
       } catch (error: any) {
         console.error(error);
         toast.error("Failed to load profile");
