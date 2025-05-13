@@ -14,6 +14,7 @@ import DiseaseDetection from "./pages/DiseaseDetection";
 import WeatherAlerts from "./pages/WeatherAlerts";
 import SpraySchedule from "./pages/SpraySchedule";
 import ExpertConsultation from "./pages/ExpertConsultation";
+import ExpertCall from "./pages/ExpertCall";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/weather-alerts" element={<WeatherAlerts />} />
             <Route path="/spray-schedule" element={<SpraySchedule />} />
             <Route path="/expert-consultation" element={<ExpertConsultation />} />
+            <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
