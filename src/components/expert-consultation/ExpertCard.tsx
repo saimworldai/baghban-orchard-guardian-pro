@@ -32,6 +32,7 @@ export function ExpertCard({ expert }: { expert: ExpertProps }) {
   const { user } = useAuth();
   const [isBooking, setIsBooking] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isStartingCall, setIsStartingCall] = useState(false);
 
   const handleStartCall = async () => {
     if (!user) {
@@ -39,7 +40,13 @@ export function ExpertCard({ expert }: { expert: ExpertProps }) {
       navigate('/auth');
       return;
     }
+    
+    if (!expert.available) {
+      toast.error("This expert is currently unavailable");
+      return;
+    }
 
+    setIsStartingCall(true);
     toast.loading("Setting up your consultation...");
 
     try {
@@ -52,18 +59,23 @@ export function ExpertCard({ expert }: { expert: ExpertProps }) {
           status: 'in_progress',
           topic: 'General Consultation',
         })
-        .select()
-        .single();
+        .select();
         
       if (error) throw error;
       
+      if (!data || data.length === 0) {
+        throw new Error('Failed to create consultation record');
+      }
+      
       toast.dismiss();
       toast.success("Starting consultation");
-      navigate(`/expert-consultation/call/${data.id}`);
+      navigate(`/expert-consultation/call/${data[0].id}`);
     } catch (error) {
       toast.dismiss();
       toast.error("Failed to set up consultation");
       console.error("Error setting up consultation:", error);
+    } finally {
+      setIsStartingCall(false);
     }
   };
 
@@ -174,10 +186,16 @@ export function ExpertCard({ expert }: { expert: ExpertProps }) {
             variant="outline" 
             size="sm" 
             className={`flex-1 ${expert.available ? 'hover:bg-green-50 hover:text-green-700' : 'opacity-70'}`}
-            disabled={!expert.available}
+            disabled={!expert.available || isStartingCall}
             onClick={handleStartCall}
           >
-            <Video className="h-4 w-4 mr-2" /> Call
+            {isStartingCall ? (
+              <span className="flex items-center">Connecting...</span>
+            ) : (
+              <>
+                <Video className="h-4 w-4 mr-2" /> Call
+              </>
+            )}
           </Button>
           <Button 
             variant="outline" 

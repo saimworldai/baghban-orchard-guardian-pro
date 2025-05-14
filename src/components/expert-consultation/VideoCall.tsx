@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +23,8 @@ export function VideoCall() {
   const [availableMicrophones, setAvailableMicrophones] = useState<MediaDeviceInfo[]>([]);
   const [connectionQuality, setConnectionQuality] = useState<'excellent' | 'good' | 'poor'>('good');
   const [isCreatingCall, setIsCreatingCall] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Check for available devices and permissions
   useEffect(() => {
@@ -30,8 +32,15 @@ export function VideoCall() {
       try {
         // Try to access the camera and microphone
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        streamRef.current = stream;
+        
         setHasCameraAccess(true);
         setHasMicrophoneAccess(true);
+        
+        // Display camera preview
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
         
         // Get all available devices
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -49,9 +58,6 @@ export function VideoCall() {
         // Check connection quality (simplified simulation)
         checkConnectionQuality();
         
-        // Stop all tracks in the stream
-        stream.getTracks().forEach(track => track.stop());
-        
       } catch (err) {
         console.error('Error accessing media devices:', err);
         if ((err as any).name === 'NotAllowedError' || (err as any).name === 'PermissionDeniedError') {
@@ -65,11 +71,65 @@ export function VideoCall() {
     }
     
     checkMediaDevices();
+    
+    // Cleanup function
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
+
+  // Handle device selection change
+  useEffect(() => {
+    async function updateMediaStream() {
+      if (!selectedCamera || !selectedMicrophone) return;
+      
+      try {
+        // Stop previous tracks
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+        }
+        
+        // Create new stream with selected devices
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: selectedCamera },
+          audio: { deviceId: selectedMicrophone }
+        });
+        
+        streamRef.current = newStream;
+        
+        // Update video preview
+        if (videoRef.current) {
+          videoRef.current.srcObject = newStream;
+        }
+      } catch (err) {
+        console.error('Error updating media devices:', err);
+        toast.error('Could not switch to selected devices');
+      }
+    }
+    
+    if (hasCameraAccess && hasMicrophoneAccess) {
+      updateMediaStream();
+    }
+  }, [selectedCamera, selectedMicrophone, hasCameraAccess, hasMicrophoneAccess]);
   
   const checkConnectionQuality = () => {
-    // Simulate connection quality check
+    // Simulate connection quality check with network conditions
     // In a real app, this would test actual network conditions
+    navigator.connection && navigator.connection.addEventListener('change', () => {
+      const connection = navigator.connection;
+      
+      if (connection.downlink > 5) {
+        setConnectionQuality('excellent');
+      } else if (connection.downlink > 2) {
+        setConnectionQuality('good');
+      } else {
+        setConnectionQuality('poor');
+      }
+    });
+    
+    // Fallback simulation if Network Information API isn't available
     const randomValue = Math.random();
     if (randomValue > 0.7) {
       setConnectionQuality('excellent');
@@ -101,18 +161,26 @@ export function VideoCall() {
         .insert({
           farmer_id: user.id,
           status: 'pending',
-          topic: 'Instant Consultation',
+          topic: 'Instant Consultation'
         })
-        .select()
-        .single();
+        .select();
         
       if (error) throw error;
       
+      if (!data || data.length === 0) {
+        throw new Error('Failed to create consultation record');
+      }
+      
       toast.success("Setting up your call with the next available expert");
-      navigate(`/expert-consultation/call/${data.id}`);
+      // Stop all tracks before navigating
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      navigate(`/expert-consultation/call/${data[0].id}`);
     } catch (error) {
-      toast.error("Failed to set up video call");
       console.error("Error setting up call:", error);
+      toast.error("Failed to set up video call");
     } finally {
       setIsCreatingCall(false);
     }
@@ -172,12 +240,12 @@ export function VideoCall() {
                 ) : hasCameraAccess ? (
                   <>
                     <video 
-                      id="preview" 
+                      ref={videoRef}
                       autoPlay 
                       muted 
                       playsInline 
                       className="w-full h-full object-cover"
-                    ></video>
+                    />
                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                       <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm">
                         Camera Preview

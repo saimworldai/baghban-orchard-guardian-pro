@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,12 @@ export default function ExpertCall() {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [callStatus, setCallStatus] = useState<'connecting' | 'connected' | 'ended'>('connecting');
+  const [notes, setNotes] = useState('');
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
+
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
 
   const { data: consultation, isLoading } = useQuery({
     queryKey: ['consultation', consultationId],
@@ -65,25 +71,122 @@ export default function ExpertCall() {
 
     updateConsultationStatus();
 
-    // Simulate connection
-    const timer = setTimeout(() => {
-      setCallStatus('connected');
-      toast.success('Call connected successfully');
-    }, 2000);
+    // Set up camera and mic for call
+    const setupMediaDevices = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true, 
+          audio: true 
+        });
+        
+        localStreamRef.current = stream;
+        
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+        }
+        
+        // In a real application, you would set up WebRTC here
+        // and connect to the remote peer
+        
+        // For demo purposes, simulate a connection with timeout
+        setTimeout(() => {
+          setCallStatus('connected');
+          toast.success('Call connected successfully');
+        }, 2000);
+      } catch (err) {
+        console.error('Error accessing media devices:', err);
+        toast.error('Could not access camera or microphone');
+      }
+    };
 
-    return () => clearTimeout(timer);
+    setupMediaDevices();
+    
+    // Cleanup function
+    return () => {
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, [user, consultationId, navigate, role]);
 
-  const handleEndCall = () => {
+  // Update notes when consultation data is loaded
+  useEffect(() => {
+    if (consultation?.notes) {
+      setNotes(consultation.notes);
+    }
+  }, [consultation]);
+
+  const handleEndCall = async () => {
+    // Stop all media tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+    }
+    
+    // Update consultation status
+    if (consultationId) {
+      try {
+        const { error } = await supabase
+          .from('consultations')
+          .update({ 
+            status: 'completed',
+            notes: notes
+          })
+          .eq('id', consultationId);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating consultation status:', error);
+      }
+    }
+    
     setCallStatus('ended');
     toast.info('Call ended');
+    
     setTimeout(() => {
       navigate('/expert-consultation');
     }, 1500);
   };
 
-  const toggleMic = () => setIsMicOn(!isMicOn);
-  const toggleCamera = () => setIsCameraOn(!isCameraOn);
+  const toggleMic = () => {
+    if (localStreamRef.current) {
+      const audioTracks = localStreamRef.current.getAudioTracks();
+      audioTracks.forEach(track => {
+        track.enabled = !isMicOn;
+      });
+      setIsMicOn(!isMicOn);
+    }
+  };
+  
+  const toggleCamera = () => {
+    if (localStreamRef.current) {
+      const videoTracks = localStreamRef.current.getVideoTracks();
+      videoTracks.forEach(track => {
+        track.enabled = !isCameraOn;
+      });
+      setIsCameraOn(!isCameraOn);
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!consultationId) return;
+    
+    setIsSavingNotes(true);
+    
+    try {
+      const { error } = await supabase
+        .from('consultations')
+        .update({ notes: notes })
+        .eq('id', consultationId);
+        
+      if (error) throw error;
+      toast.success("Notes saved successfully");
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      toast.error("Failed to save notes");
+    } finally {
+      setIsSavingNotes(false);
+    }
+  };
 
   if (isLoading || !consultation) {
     return (
@@ -114,15 +217,36 @@ export default function ExpertCall() {
               <div className="text-white">Call ended. Thank you!</div>
             ) : (
               <>
+                {/* Main video area (remote video in real implementation) */}
+                <video 
+                  ref={remoteVideoRef}
+                  autoPlay 
+                  playsInline 
+                  className="w-full h-full object-cover"
+                  style={{ display: isCameraOn ? 'block' : 'none' }}
+                />
+                
                 {!isCameraOn && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
                     <div className="text-white text-lg">Camera Off</div>
                   </div>
                 )}
+                
+                {/* Local video preview (your camera) */}
                 <div className="absolute bottom-4 right-4 w-32 h-24 bg-gray-800 border-2 border-white rounded-md overflow-hidden">
-                  <div className="h-full w-full flex items-center justify-center">
-                    <span className="text-white text-xs">Your camera</span>
-                  </div>
+                  <video 
+                    ref={localVideoRef}
+                    autoPlay 
+                    muted 
+                    playsInline 
+                    className="h-full w-full object-cover"
+                    style={{ display: isCameraOn ? 'block' : 'none' }}
+                  />
+                  {!isCameraOn && (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <span className="text-white text-xs">Camera Off</span>
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -157,6 +281,7 @@ export default function ExpertCall() {
                 variant="outline" 
                 className={isMicOn ? "bg-white" : "bg-red-100 text-red-700"}
                 onClick={toggleMic}
+                disabled={callStatus !== 'connected'}
               >
                 {isMicOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
               </Button>
@@ -164,6 +289,7 @@ export default function ExpertCall() {
                 variant="outline"
                 className={isCameraOn ? "bg-white" : "bg-red-100 text-red-700"}
                 onClick={toggleCamera}
+                disabled={callStatus !== 'connected'}
               >
                 {isCameraOn ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
               </Button>
@@ -186,13 +312,20 @@ export default function ExpertCall() {
           <Textarea 
             placeholder="Take notes during your consultation..."
             className="min-h-32"
-            value={consultation.notes || ''}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
             readOnly={role !== 'consultant' && role !== 'admin'}
           />
           
           {(role === 'consultant' || role === 'admin') && (
             <div className="mt-4 flex justify-end">
-              <Button>Save Notes</Button>
+              <Button 
+                onClick={handleSaveNotes} 
+                disabled={isSavingNotes}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {isSavingNotes ? 'Saving...' : 'Save Notes'}
+              </Button>
             </div>
           )}
         </CardContent>
