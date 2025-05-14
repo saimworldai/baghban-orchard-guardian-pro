@@ -22,7 +22,7 @@ const mockTips: Tip[] = [
   {
     id: '1',
     title: 'Prepare Your Orchard for Winter',
-    content: 'Apply a layer of mulch around the base of your trees to insulate roots from freezing temperatures. Ensure it's 3-4 inches thick but kept away from direct contact with the trunk to prevent rot and pest issues.',
+    content: "Apply a layer of mulch around the base of your trees to insulate roots from freezing temperatures. Ensure it's 3-4 inches thick but kept away from direct contact with the trunk to prevent rot and pest issues.",
     imageUrl: '/placeholder.svg',
     category: 'seasonal',
     date: '2023-11-01',
