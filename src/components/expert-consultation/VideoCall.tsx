@@ -1,130 +1,341 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Video, Mic, MicOff, PhoneCall } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole } from '@/hooks/useUserRole';
+import { useAuth } from '@/contexts/AuthProvider';
+import { toast } from '@/components/ui/sonner';
+import { Video, Clock, Calendar, Mic, Camera, User, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function VideoCall() {
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isInCall, setIsInCall] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [callTime, setCallTime] = useState(0);
-  
-  const handleStartCall = () => {
-    setIsConnecting(true);
-    toast.info("Connecting to expert...");
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { role } = useUserRole();
+  const [isCheckingDevices, setIsCheckingDevices] = useState(true);
+  const [hasCameraAccess, setHasCameraAccess] = useState(false);
+  const [hasMicrophoneAccess, setHasMicrophoneAccess] = useState(false);
+  const [selectedCamera, setSelectedCamera] = useState<string | null>(null);
+  const [selectedMicrophone, setSelectedMicrophone] = useState<string | null>(null);
+  const [availableCameras, setAvailableCameras] = useState<MediaDeviceInfo[]>([]);
+  const [availableMicrophones, setAvailableMicrophones] = useState<MediaDeviceInfo[]>([]);
+  const [connectionQuality, setConnectionQuality] = useState<'excellent' | 'good' | 'poor'>('good');
+  const [isCreatingCall, setIsCreatingCall] = useState(false);
+
+  // Check for available devices and permissions
+  useEffect(() => {
+    async function checkMediaDevices() {
+      try {
+        // Try to access the camera and microphone
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setHasCameraAccess(true);
+        setHasMicrophoneAccess(true);
+        
+        // Get all available devices
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        
+        // Filter for video input (cameras)
+        const cameras = devices.filter(device => device.kind === 'videoinput');
+        setAvailableCameras(cameras);
+        if (cameras.length > 0) setSelectedCamera(cameras[0].deviceId);
+        
+        // Filter for audio input (microphones)
+        const microphones = devices.filter(device => device.kind === 'audioinput');
+        setAvailableMicrophones(microphones);
+        if (microphones.length > 0) setSelectedMicrophone(microphones[0].deviceId);
+        
+        // Check connection quality (simplified simulation)
+        checkConnectionQuality();
+        
+        // Stop all tracks in the stream
+        stream.getTracks().forEach(track => track.stop());
+        
+      } catch (err) {
+        console.error('Error accessing media devices:', err);
+        if ((err as any).name === 'NotAllowedError' || (err as any).name === 'PermissionDeniedError') {
+          toast.error('Camera and microphone access is required for video calls');
+        } else {
+          toast.error('Error accessing your camera or microphone');
+        }
+      } finally {
+        setIsCheckingDevices(false);
+      }
+    }
     
-    // Simulate connection delay
-    setTimeout(() => {
-      setIsConnecting(false);
-      setIsInCall(true);
-      toast.success("Connected with Dr. Sarah Khan");
-      
-      // Start timer
-      const timer = setInterval(() => {
-        setCallTime(prev => prev + 1);
-      }, 1000);
-      
-      // Cleanup timer on component unmount
-      return () => clearInterval(timer);
-    }, 2000);
+    checkMediaDevices();
+  }, []);
+  
+  const checkConnectionQuality = () => {
+    // Simulate connection quality check
+    // In a real app, this would test actual network conditions
+    const randomValue = Math.random();
+    if (randomValue > 0.7) {
+      setConnectionQuality('excellent');
+    } else if (randomValue > 0.3) {
+      setConnectionQuality('good');
+    } else {
+      setConnectionQuality('poor');
+    }
   };
   
-  const handleEndCall = () => {
-    setIsInCall(false);
-    setCallTime(0);
-    toast.info("Call ended");
+  const handleStartCall = async () => {
+    if (!user) {
+      toast.error("Please login to start a video call");
+      navigate('/auth');
+      return;
+    }
+    
+    if (!hasCameraAccess || !hasMicrophoneAccess) {
+      toast.error("Camera and microphone access are required for video calls");
+      return;
+    }
+    
+    setIsCreatingCall(true);
+    
+    try {
+      // Create a new consultation in the database
+      const { data, error } = await supabase
+        .from('consultations')
+        .insert({
+          farmer_id: user.id,
+          status: 'pending',
+          topic: 'Instant Consultation',
+        })
+        .select()
+        .single();
+        
+      if (error) throw error;
+      
+      toast.success("Setting up your call with the next available expert");
+      navigate(`/expert-consultation/call/${data.id}`);
+    } catch (error) {
+      toast.error("Failed to set up video call");
+      console.error("Error setting up call:", error);
+    } finally {
+      setIsCreatingCall(false);
+    }
   };
   
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  const getConnectionQualityDisplay = () => {
+    switch (connectionQuality) {
+      case 'excellent':
+        return (
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="text-green-600 text-xs ml-1">Excellent</span>
+          </div>
+        );
+      case 'good':
+        return (
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-green-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-gray-300 rounded-full"></span>
+            <span className="text-green-600 text-xs ml-1">Good</span>
+          </div>
+        );
+      case 'poor':
+        return (
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 bg-orange-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-orange-500 rounded-full"></span>
+            <span className="h-2 w-2 bg-gray-300 rounded-full"></span>
+            <span className="h-2 w-2 bg-gray-300 rounded-full"></span>
+            <span className="text-orange-600 text-xs ml-1">Poor</span>
+          </div>
+        );
+    }
   };
 
   return (
-    <div className="space-y-4">
-      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-100">
+    <div className="space-y-6">
+      <Card className="border-green-100">
         <CardHeader>
-          <CardTitle className="text-purple-800">Video Consultation</CardTitle>
+          <CardTitle className="text-green-800">Video Consultation</CardTitle>
         </CardHeader>
         <CardContent>
-          {!isInCall ? (
-            <div className="flex flex-col items-center justify-center space-y-6 p-8">
-              <div className="w-full max-w-md p-6 rounded-xl bg-white/80 shadow-sm border border-purple-100 flex flex-col items-center space-y-4">
-                <Video className="h-16 w-16 text-purple-500 mb-2" />
-                <h3 className="text-xl font-semibold text-purple-800">Start a Video Call</h3>
-                <p className="text-center text-gray-600">
-                  Connect with an agricultural expert instantly via video call to discuss your farming concerns.
-                </p>
-                <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 my-2">
-                  🎁 First Consultation Free!
-                </Badge>
+          <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
+            {/* Video Preview */}
+            <div className="w-full md:w-2/3">
+              <div className="bg-gray-900 aspect-video rounded-lg flex items-center justify-center overflow-hidden relative">
+                {isCheckingDevices ? (
+                  <div className="text-white flex flex-col items-center gap-2">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                    <p>Checking your camera and microphone...</p>
+                  </div>
+                ) : hasCameraAccess ? (
+                  <>
+                    <video 
+                      id="preview" 
+                      autoPlay 
+                      muted 
+                      playsInline 
+                      className="w-full h-full object-cover"
+                    ></video>
+                    <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                      <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                        Camera Preview
+                      </div>
+                      {getConnectionQualityDisplay()}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-white text-center p-4">
+                    <Camera className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                    <p className="mb-2">Camera access is required</p>
+                    <Button 
+                      onClick={() => window.location.reload()}
+                      variant="outline"
+                      className="bg-white text-gray-800"
+                    >
+                      Allow Access
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Camera</label>
+                  <select 
+                    className="w-full p-2 border border-gray-300 rounded-md bg-white"
+                    disabled={!hasCameraAccess || availableCameras.length === 0}
+                    value={selectedCamera || ''}
+                    onChange={(e) => setSelectedCamera(e.target.value)}
+                  >
+                    {availableCameras.map((camera) => (
+                      <option key={camera.deviceId} value={camera.deviceId}>
+                        {camera.label || `Camera ${camera.deviceId.substring(0, 5)}...`}
+                      </option>
+                    ))}
+                    {availableCameras.length === 0 && (
+                      <option value="">No cameras found</option>
+                    )}
+                  </select>
+                </div>
+                
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Microphone</label>
+                  <select 
+                    className="w-full p-2 border border-gray-300 rounded-md bg-white"
+                    disabled={!hasMicrophoneAccess || availableMicrophones.length === 0}
+                    value={selectedMicrophone || ''}
+                    onChange={(e) => setSelectedMicrophone(e.target.value)}
+                  >
+                    {availableMicrophones.map((mic) => (
+                      <option key={mic.deviceId} value={mic.deviceId}>
+                        {mic.label || `Microphone ${mic.deviceId.substring(0, 5)}...`}
+                      </option>
+                    ))}
+                    {availableMicrophones.length === 0 && (
+                      <option value="">No microphones found</option>
+                    )}
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            {/* Call Info */}
+            <div className="w-full md:w-1/3 space-y-6">
+              <motion.div 
+                className="bg-green-50 p-6 rounded-lg border border-green-100"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <h3 className="text-xl font-semibold text-green-800 mb-4">Ready for Your Consultation?</h3>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-green-100">
+                      <User className="h-5 w-5 text-green-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Expert Available</p>
+                      <p className="text-sm text-gray-600">Connect with the next available specialist</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-green-100">
+                      <Clock className="h-5 w-5 text-green-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Typical Wait Time</p>
+                      <p className="text-sm text-gray-600">Less than 5 minutes</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-green-100">
+                      <Calendar className="h-5 w-5 text-green-700" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Consultation Duration</p>
+                      <p className="text-sm text-gray-600">Up to 30 minutes</p>
+                    </div>
+                  </div>
+                </div>
+                
                 <Button 
-                  size="lg" 
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white gap-2"
+                  className="w-full mt-6 bg-green-600 hover:bg-green-700"
+                  size="lg"
                   onClick={handleStartCall}
-                  disabled={isConnecting}
+                  disabled={isCheckingDevices || !hasCameraAccess || !hasMicrophoneAccess || isCreatingCall}
                 >
-                  {isConnecting ? (
-                    <>Connecting...</>
+                  {isCreatingCall ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Setting up call...
+                    </>
                   ) : (
                     <>
-                      <PhoneCall className="h-5 w-5" />
-                      Call an Expert Now
+                      <Video className="mr-2 h-5 w-5" />
+                      Start Video Consultation
                     </>
                   )}
                 </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center space-y-4">
-              <div className="relative w-full max-w-2xl aspect-video bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
-                <span className="text-white/50">Video stream would appear here</span>
                 
-                {/* Call timer */}
-                <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                  {formatTime(callTime)}
-                </div>
-                
-                {/* Expert info */}
-                <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/50 text-white px-3 py-2 rounded-lg">
-                  <Avatar className="h-8 w-8 border-2 border-white">
-                    <AvatarFallback>SK</AvatarFallback>
-                  </Avatar>
-                  <span>Dr. Sarah Khan</span>
-                </div>
-              </div>
+                {connectionQuality === 'poor' && (
+                  <p className="text-orange-600 text-sm mt-2">
+                    Your internet connection is weak. This may affect call quality.
+                  </p>
+                )}
+              </motion.div>
               
-              <div className="flex space-x-4">
-                <Button 
-                  variant="outline" 
-                  size="lg"
-                  className={isMuted ? "bg-red-50 text-red-700 border-red-200" : ""}
-                  onClick={() => {
-                    setIsMuted(!isMuted);
-                    toast.info(isMuted ? "Microphone unmuted" : "Microphone muted");
-                  }}
-                >
-                  {isMuted ? <MicOff className="h-5 w-5 mr-2" /> : <Mic className="h-5 w-5 mr-2" />}
-                  {isMuted ? "Unmute" : "Mute"}
-                </Button>
-                <Button 
-                  variant="destructive" 
-                  size="lg"
-                  onClick={handleEndCall}
-                >
-                  <PhoneCall className="h-5 w-5 mr-2" />
-                  End Call
-                </Button>
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <h4 className="font-medium mb-2">Before your call:</h4>
+                <ul className="space-y-2 text-sm text-gray-600 list-disc pl-5">
+                  <li>Ensure you have good lighting so the expert can see clearly</li>
+                  <li>Prepare any specific questions you want to ask</li>
+                  <li>Have your plant/tree accessible if you need to show it</li>
+                  <li>Consider taking close-up photos beforehand</li>
+                </ul>
               </div>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
+      
+      {!user && (
+        <Card className="border-orange-100 bg-orange-50">
+          <CardContent className="p-4">
+            <p className="text-orange-600">Please log in to start a video consultation with our experts.</p>
+            <Button 
+              variant="link" 
+              className="text-orange-700 p-0"
+              onClick={() => navigate('/auth')}
+            >
+              Login or Register
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
