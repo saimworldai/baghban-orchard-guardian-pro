@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Globe, Languages, Mic, VolumeUp, Info } from "lucide-react";
+import { Check, Globe, Languages, Mic, Volume, Info } from "lucide-react";
 import { toast } from '@/components/ui/sonner';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -134,7 +134,7 @@ export function LanguageSupport() {
                 className={`w-full justify-start ${voiceOutputEnabled ? "bg-primary/10" : ""}`}
                 onClick={toggleVoiceOutput}
               >
-                <VolumeUp className={`mr-2 h-4 w-4 ${voiceOutputEnabled ? "text-primary" : ""}`} />
+                <Volume className={`mr-2 h-4 w-4 ${voiceOutputEnabled ? "text-primary" : ""}`} />
                 Voice Output
                 <Badge className={`ml-auto ${voiceOutputEnabled ? "bg-green-100 text-green-800" : "bg-gray-100"}`}>
                   {voiceOutputEnabled ? "On" : "Off"}
