@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,12 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { toast } from '@/components/ui/sonner';
 import { Video, Clock, Calendar, Mic, Camera, User, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+// Define a type for connection information
+interface ConnectionInfo {
+  downlink?: number;
+  effectiveType?: string;
+}
 
 export function VideoCall() {
   const { user } = useAuth();
@@ -115,20 +120,40 @@ export function VideoCall() {
   }, [selectedCamera, selectedMicrophone, hasCameraAccess, hasMicrophoneAccess]);
   
   const checkConnectionQuality = () => {
-    // Simulate connection quality check with network conditions
-    // In a real app, this would test actual network conditions
-    navigator.connection && navigator.connection.addEventListener('change', () => {
-      const connection = navigator.connection;
+    // Modified to handle browsers that don't support the Network Information API
+    try {
+      // Check if navigator.connection exists (Network Information API)
+      const connection = (navigator as any).connection as ConnectionInfo | undefined;
       
-      if (connection.downlink > 5) {
-        setConnectionQuality('excellent');
-      } else if (connection.downlink > 2) {
-        setConnectionQuality('good');
+      if (connection) {
+        // Subscribe to connection changes if API is available
+        (navigator as any).connection.addEventListener('change', () => {
+          updateConnectionQuality(connection);
+        });
+        
+        // Initial check
+        updateConnectionQuality(connection);
       } else {
-        setConnectionQuality('poor');
+        // Fallback if Network Information API is not available
+        simulateConnectionQuality();
       }
-    });
-    
+    } catch (error) {
+      // Fallback if any error occurs
+      simulateConnectionQuality();
+    }
+  };
+  
+  const updateConnectionQuality = (connection: ConnectionInfo) => {
+    if (connection.downlink && connection.downlink > 5) {
+      setConnectionQuality('excellent');
+    } else if (connection.downlink && connection.downlink > 2) {
+      setConnectionQuality('good');
+    } else {
+      setConnectionQuality('poor');
+    }
+  };
+  
+  const simulateConnectionQuality = () => {
     // Fallback simulation if Network Information API isn't available
     const randomValue = Math.random();
     if (randomValue > 0.7) {
