@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthProvider";
@@ -23,9 +24,13 @@ import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
 export function Navigation() {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const { role } = useUserRole();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <div className="bg-white shadow-sm sticky top-0 z-50">
@@ -116,7 +121,7 @@ export function Navigation() {
                 Profile
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => logout()}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
@@ -219,7 +224,7 @@ export function Navigation() {
                     Profile
                   </NavLink>
                   <Button variant="ghost" className="w-full justify-start" onClick={() => {
-                    logout();
+                    handleLogout();
                     setIsMobileMenuOpen(false);
                   }}>
                     Logout
@@ -241,3 +246,5 @@ export function Navigation() {
     </div>
   );
 }
+
+export default Navigation;
