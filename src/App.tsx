@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,33 +14,38 @@ import WeatherAlerts from "./pages/WeatherAlerts";
 import SpraySchedule from "./pages/SpraySchedule";
 import ExpertConsultation from "./pages/ExpertConsultation";
 import ExpertCall from "./pages/ExpertCall";
+import AdminConsultation from "./pages/AdminConsultation";
+import CallMonitor from "./pages/CallMonitor";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <Navigation />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/disease-detection" element={<DiseaseDetection />} />
-            <Route path="/weather-alerts" element={<WeatherAlerts />} />
-            <Route path="/spray-schedule" element={<SpraySchedule />} />
-            <Route path="/expert-consultation" element={<ExpertConsultation />} />
-            <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <Navigation />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/weather-alerts" element={<WeatherAlerts />} />
+              <Route path="/disease-detection" element={<DiseaseDetection />} />
+              <Route path="/spray-schedule" element={<SpraySchedule />} />
+              <Route path="/expert-consultation" element={<ExpertConsultation />} />
+              <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
+              <Route path="/admin-consultation" element={<AdminConsultation />} />
+              <Route path="/expert-consultation/monitor/:consultationId" element={<CallMonitor />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

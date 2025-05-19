@@ -19,7 +19,26 @@ export function useUserRole() {
       }
 
       try {
-        // First try to get the role from the profiles table
+        // First try to check if a user_roles table exists
+        // This is more robust than relying on the email pattern
+        try {
+          const { data: roleData, error: roleError } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', user.id)
+            .single();
+            
+          if (roleData?.role) {
+            setRole(roleData.role as UserRole);
+            setLoading(false);
+            return;
+          }
+        } catch (roleCheckError) {
+          // If the user_roles table doesn't exist, continue to email-based detection
+          console.log('User roles table may not exist yet, falling back to email pattern');
+        }
+        
+        // Get user profile
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -28,12 +47,8 @@ export function useUserRole() {
 
         if (error) throw error;
         
-        // For now, since the role column might not exist yet, we'll default to 'farmer'
-        // In the future, you can use the actual role from the database
-        // setRole((data?.role as UserRole) || 'farmer');
-        
-        // Temporary solution - hardcoded roles for testing
-        // You can replace this with actual role from the database once the schema is updated
+        // Temporary solution - email-based role detection
+        // This should be replaced with a proper role-based system
         if (user.email?.includes('admin')) {
           setRole('admin');
         } else if (user.email?.includes('consultant')) {

@@ -1,78 +1,243 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthProvider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserCheck, LogIn, Home, TreeDeciduous } from 'lucide-react';
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthProvider";
+import { useUserRole } from "@/hooks/useUserRole";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
 
-const Navigation = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Don't show on auth page
-  if (location.pathname === '/auth') return null;
+export function Navigation() {
+  const { user, logout } = useAuth();
+  const { role } = useUserRole();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-green-100 bg-white/90 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <TreeDeciduous className="h-8 w-8 text-green-600" />
-          <span className="text-xl font-bold bg-gradient-to-br from-green-800 to-blue-700 bg-clip-text text-transparent hidden sm:inline-block">
-            Baghban Guardian
-          </span>
-        </Link>
-
-        <div className="flex items-center gap-4">
-          <Link to="/">
-            <Button variant="ghost" size="sm" className="hidden md:flex gap-1">
-              <Home className="h-4 w-4" />
-              Home
-            </Button>
-          </Link>
-
-          <Link to="/expert-consultation">
-            <Button variant="ghost" size="sm" className="hidden md:flex gap-1">
-              <UserCheck className="h-4 w-4" />
-              Expert Consultation
-            </Button>
-          </Link>
-
-          {user ? (
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="border-green-200 text-green-700 hover:bg-green-50"
-                onClick={() => navigate('/profile')}
-              >
-                <UserCheck className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Profile</span>
-              </Button>
-              
-              <Avatar 
-                className="h-8 w-8 cursor-pointer border-2 border-green-100" 
-                onClick={() => navigate('/profile')}
-              >
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-gradient-to-br from-green-500 to-blue-500 text-white">
-                  {user.email?.charAt(0).toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          ) : (
-            <Button 
-              size="sm"
-              className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-              onClick={() => navigate('/auth')}
+    <div className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="container mx-auto px-4 flex justify-between items-center h-16">
+        <NavLink to="/" className="text-lg font-semibold">
+          Orchard Management
+        </NavLink>
+        
+        <div className="hidden md:flex items-center space-x-8">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-medium"
+                : "text-gray-600 hover:text-green-600 transition-colors"
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/weather-alerts"
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-medium"
+                : "text-gray-600 hover:text-green-600 transition-colors"
+            }
+          >
+            Weather Alerts
+          </NavLink>
+          <NavLink
+            to="/disease-detection"
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-medium"
+                : "text-gray-600 hover:text-green-600 transition-colors"
+            }
+          >
+            Disease Detection
+          </NavLink>
+          <NavLink
+            to="/spray-schedule"
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-medium"
+                : "text-gray-600 hover:text-green-600 transition-colors"
+            }
+          >
+            Spray Schedule
+          </NavLink>
+          <NavLink
+            to="/expert-consultation"
+            className={({ isActive }) =>
+              isActive
+                ? "text-green-600 font-medium"
+                : "text-gray-600 hover:text-green-600 transition-colors"
+            }
+          >
+            Expert Consultation
+          </NavLink>
+          
+          {role === 'admin' && (
+            <NavLink
+              to="/admin-consultation"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-green-600 font-medium"
+                  : "text-gray-600 hover:text-green-600 transition-colors"
+              }
             >
-              <LogIn className="h-4 w-4 mr-2" />
-              Login
-            </Button>
+              Admin Dashboard
+            </NavLink>
           )}
         </div>
+        
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+                  <AvatarFallback>{user.user_metadata?.full_name?.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => window.location.href = '/profile'}>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => logout()}>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <NavLink to="/auth" className="text-gray-600 hover:text-green-600 transition-colors">
+            Sign In
+          </NavLink>
+        )}
+        
+        <Sheet>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" className="p-2">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-64">
+            <SheetHeader>
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription>
+                Navigate through the application.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="grid gap-4 py-4">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive
+                    ? "block py-3 px-4 bg-green-50 text-green-600 font-medium"
+                    : "block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                }
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Home
+              </NavLink>
+              <NavLink
+                to="/weather-alerts"
+                className={({ isActive }) =>
+                  isActive
+                    ? "block py-3 px-4 bg-green-50 text-green-600 font-medium"
+                    : "block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                }
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Weather Alerts
+              </NavLink>
+              <NavLink
+                to="/disease-detection"
+                className={({ isActive }) =>
+                  isActive
+                    ? "block py-3 px-4 bg-green-50 text-green-600 font-medium"
+                    : "block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                }
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Disease Detection
+              </NavLink>
+              <NavLink
+                to="/spray-schedule"
+                className={({ isActive }) =>
+                  isActive
+                    ? "block py-3 px-4 bg-green-50 text-green-600 font-medium"
+                    : "block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                }
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Spray Schedule
+              </NavLink>
+              <NavLink
+                to="/expert-consultation"
+                className={({ isActive }) =>
+                  isActive
+                    ? "block py-3 px-4 bg-green-50 text-green-600 font-medium"
+                    : "block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                }
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Expert Consultation
+              </NavLink>
+              
+              {role === 'admin' && (
+                <NavLink
+                  to="/admin-consultation"
+                  className={({ isActive }) =>
+                    isActive
+                      ? "block py-3 px-4 bg-green-50 text-green-600 font-medium"
+                      : "block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                  }
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </NavLink>
+              )}
+              
+              {user ? (
+                <>
+                  <NavLink
+                    to="/profile"
+                    className="block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </NavLink>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}>
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <NavLink
+                  to="/auth"
+                  className="block py-3 px-4 text-gray-600 hover:bg-gray-50 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Sign In
+                </NavLink>
+              )}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
-    </header>
+    </div>
   );
-};
-
-export default Navigation;
+}
