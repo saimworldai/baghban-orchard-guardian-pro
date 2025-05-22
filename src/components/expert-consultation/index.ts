@@ -25,3 +25,8 @@ export { LoadingSection } from './LoadingSection';
 export { ConsultantDashboardView } from './ConsultantDashboardView';
 export { FarmerDashboardView } from './FarmerDashboardView';
 export { AdvancedFeaturesSection } from './AdvancedFeaturesSection';
+export { SearchBar } from './SearchBar';
+export { SortSelect } from './SortSelect';
+export { FilterPopover } from './FilterPopover';
+export { ExpertsGrid } from './ExpertsGrid';
+export { NoResultsMessage } from './NoResultsMessage';
