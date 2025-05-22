@@ -12,3 +12,5 @@ export { HistorySection } from './HistorySection';
 export { DailyTipsCarousel } from './DailyTipsCarousel';
 export { SmartNotifications } from './SmartNotifications';
 export { LanguageSupport } from './LanguageSupport';
+export { ConsultationTable } from './ConsultationTable';
+export { StatusBadge } from './StatusBadge';
