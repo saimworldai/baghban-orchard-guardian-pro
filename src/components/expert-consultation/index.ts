@@ -14,3 +14,8 @@ export { SmartNotifications } from './SmartNotifications';
 export { LanguageSupport } from './LanguageSupport';
 export { ConsultationTable } from './ConsultationTable';
 export { StatusBadge } from './StatusBadge';
+export { AuthPromptSection } from './AuthPromptSection';
+export { LoadingSection } from './LoadingSection';
+export { ConsultantDashboardView } from './ConsultantDashboardView';
+export { FarmerDashboardView } from './FarmerDashboardView';
+export { AdvancedFeaturesSection } from './AdvancedFeaturesSection';
