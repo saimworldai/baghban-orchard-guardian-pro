@@ -14,6 +14,8 @@ export { VerifiedBadge } from './VerifiedBadge';
 export { ConsultantDashboard } from './ConsultantDashboard';
 export { HeaderSection } from './HeaderSection';
 export { TabsSection } from './TabsSection';
+export { TabTriggers } from './TabTriggers';
+export { TabContents } from './TabContents';
 export { HistorySection } from './HistorySection';
 export { DailyTipsCarousel } from './DailyTipsCarousel';
 export { SmartNotifications } from './SmartNotifications';
