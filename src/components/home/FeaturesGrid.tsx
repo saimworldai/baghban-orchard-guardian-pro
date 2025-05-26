@@ -1,136 +1,192 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { 
   Camera, 
-  CloudSun, 
-  Sprout, 
-  BookOpen, 
-  UserCheck, 
-  ShoppingCart,
-  ArrowRight
+  CloudRain, 
+  Users, 
+  Calendar,
+  TrendingUp,
+  Shield,
+  Smartphone,
+  BarChart3,
+  Zap
 } from 'lucide-react';
 
 const features = [
-  { 
-    name: 'Disease Detection', 
-    icon: Camera, 
-    description: 'AI-powered image analysis for early detection of common apple tree diseases with 95% accuracy',
-    color: 'from-red-500/20 to-orange-500/20',
-    textColor: 'text-red-700',
-    link: '/disease-detection',
-    badge: 'AI Powered'
+  {
+    icon: Camera,
+    title: "AI Disease Detection",
+    description: "Upload photos to instantly identify plant diseases with 98% accuracy. Get treatment recommendations within seconds.",
+    benefits: ["Instant diagnosis", "Treatment plans", "Prevention tips"],
+    color: "from-green-500 to-emerald-500",
+    bgColor: "from-green-50 to-emerald-50"
   },
-  { 
-    name: 'Weather Alerts', 
-    icon: CloudSun, 
-    description: 'Real-time weather forecasts and frost warnings with location-based precision',
-    color: 'from-blue-500/20 to-cyan-500/20',
-    textColor: 'text-blue-700',
-    link: '/weather-alerts',
-    badge: 'Real-time'
+  {
+    icon: CloudRain,
+    title: "Weather Intelligence",
+    description: "Hyper-local weather forecasts and alerts help you make informed decisions about irrigation and protection.",
+    benefits: ["7-day forecasts", "Smart alerts", "Irrigation guidance"],
+    color: "from-blue-500 to-cyan-500",
+    bgColor: "from-blue-50 to-cyan-50"
   },
-  { 
-    name: 'Spray Schedule', 
-    icon: Sprout, 
-    description: 'Smart spray scheduling system optimized for disease prevention and weather conditions',
-    color: 'from-green-500/20 to-emerald-500/20',
-    textColor: 'text-green-700',
-    link: '/spray-schedule',
-    badge: 'Smart'
+  {
+    icon: Users,
+    title: "Expert Consultation",
+    description: "Connect with certified agricultural experts via video calls, chat, or scheduled consultations.",
+    benefits: ["24/7 availability", "Certified experts", "Multi-language support"],
+    color: "from-purple-500 to-violet-500",
+    bgColor: "from-purple-50 to-violet-50"
   },
-  { 
-    name: 'Knowledge Hub', 
-    icon: BookOpen, 
-    description: 'Comprehensive guides and tutorials from agricultural experts worldwide',
-    color: 'from-amber-500/20 to-yellow-500/20',
-    textColor: 'text-amber-700',
-    link: '#',
-    badge: 'Expert Tips'
+  {
+    icon: Calendar,
+    title: "Smart Scheduling",
+    description: "AI-optimized spray schedules based on weather, crop stage, and disease pressure for maximum effectiveness.",
+    benefits: ["Weather integration", "Cost optimization", "Automated reminders"],
+    color: "from-amber-500 to-orange-500",
+    bgColor: "from-amber-50 to-orange-50"
   },
-  { 
-    name: 'Expert Consultation', 
-    icon: UserCheck, 
-    description: 'Connect with certified agriculture experts for personalized guidance 24/7',
-    color: 'from-purple-500/20 to-violet-500/20',
-    textColor: 'text-purple-700',
-    link: '/expert-consultation',
-    badge: '24/7 Support'
+  {
+    icon: TrendingUp,
+    title: "Yield Analytics",
+    description: "Track and analyze your orchard's performance with detailed insights and recommendations for improvement.",
+    benefits: ["Performance tracking", "Yield predictions", "ROI analysis"],
+    color: "from-emerald-500 to-teal-500",
+    bgColor: "from-emerald-50 to-teal-50"
   },
-  { 
-    name: 'Shop', 
-    icon: ShoppingCart, 
-    description: 'Quality tools, equipment, and supplies for professional orchard management',
-    color: 'from-teal-500/20 to-cyan-500/20',
-    textColor: 'text-teal-700',
-    link: '#',
-    badge: 'Premium Quality'
+  {
+    icon: Shield,
+    title: "Risk Management",
+    description: "Advanced monitoring systems to predict and prevent crop losses from diseases, pests, and weather.",
+    benefits: ["Early warnings", "Risk assessment", "Insurance support"],
+    color: "from-red-500 to-pink-500",
+    bgColor: "from-red-50 to-pink-50"
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile Optimized",
+    description: "Full-featured mobile app that works offline, perfect for use in the field with poor connectivity.",
+    benefits: ["Offline capability", "GPS tracking", "Photo sync"],
+    color: "from-indigo-500 to-blue-500",
+    bgColor: "from-indigo-50 to-blue-50"
+  },
+  {
+    icon: BarChart3,
+    title: "Business Intelligence",
+    description: "Comprehensive reports and analytics to help you make data-driven decisions and improve profitability.",
+    benefits: ["Custom reports", "Export data", "Trend analysis"],
+    color: "from-slate-500 to-gray-500",
+    bgColor: "from-slate-50 to-gray-50"
+  },
+  {
+    icon: Zap,
+    title: "Automation Hub",
+    description: "Connect with IoT devices and automate irrigation, monitoring, and data collection across your orchard.",
+    benefits: ["IoT integration", "Smart sensors", "Automated workflows"],
+    color: "from-yellow-500 to-amber-500",
+    bgColor: "from-yellow-50 to-amber-50"
   }
 ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  show: {
+  visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1
+      staggerChildren: 0.1,
+      delayChildren: 0.3
     }
   }
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
+const cardVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
     scale: 1,
-    transition: { 
-      type: "spring", 
+    transition: {
+      type: "spring",
       stiffness: 100,
       damping: 15
-    } 
+    }
   }
 };
 
 export function FeaturesGrid() {
   return (
-    <motion.div 
-      variants={containerVariants}
+    <motion.section 
+      className="mb-20"
       initial="hidden"
-      animate="show"
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-20"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      variants={containerVariants}
+      role="region"
+      aria-labelledby="features-title"
     >
-      {features.map((feature, index) => (
-        <motion.div key={feature.name} variants={itemVariants}>
-          <Link to={feature.link} className="group block h-full">
-            <Card className="relative overflow-hidden transition-all duration-500 group-hover:translate-y-[-12px] group-hover:shadow-2xl bg-white/95 backdrop-blur-md border-primary/10 h-full group-hover:border-primary/20">
-              <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-40 group-hover:opacity-70 transition-opacity duration-500`}></div>
-              <CardContent className="relative p-10 h-full flex flex-col">
-                <div className="flex items-start justify-between mb-6">
-                  <div className="p-4 rounded-2xl bg-white/90 shadow-lg group-hover:scale-125 group-hover:rotate-6 transition-all duration-500">
-                    <feature.icon size={36} className={`${feature.textColor}`} />
-                  </div>
-                  <Badge variant="secondary" className="bg-white/90 text-gray-700 text-sm font-semibold px-3 py-1">
-                    {feature.badge}
-                  </Badge>
+      <div className="text-center mb-16">
+        <motion.h2 
+          id="features-title"
+          variants={cardVariants}
+          className="text-4xl md:text-5xl font-bold text-gray-800 mb-6"
+        >
+          Everything You Need to Succeed
+        </motion.h2>
+        <motion.p 
+          variants={cardVariants}
+          className="text-xl text-gray-600 max-w-3xl mx-auto"
+        >
+          Our comprehensive platform combines cutting-edge technology with agricultural expertise 
+          to help you optimize every aspect of your orchard management.
+        </motion.p>
+      </div>
+
+      <motion.div 
+        variants={containerVariants}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
+        {features.map((feature, index) => (
+          <motion.div
+            key={feature.title}
+            variants={cardVariants}
+            whileHover={{ 
+              y: -10, 
+              scale: 1.02,
+              transition: { type: "spring", stiffness: 300 }
+            }}
+            className="group cursor-pointer"
+          >
+            <Card className="h-full bg-white/90 backdrop-blur-md border-gray-100 hover:border-gray-200 shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden">
+              <div className={`h-2 bg-gradient-to-r ${feature.color}`} />
+              
+              <CardHeader className="pb-4">
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <feature.icon className={`h-8 w-8 bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`} />
                 </div>
-                <h3 className="text-2xl font-bold mb-4 group-hover:text-gray-800 transition-colors">
-                  {feature.name}
-                </h3>
-                <p className="text-gray-600 leading-relaxed flex-grow text-lg">{feature.description}</p>
-                <div className="mt-6 flex items-center text-base font-semibold text-gray-700 group-hover:text-gray-900">
-                  Learn more 
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-2 transition-transform duration-300" />
+                <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors">
+                  {feature.title}
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {feature.description}
+                </p>
+                
+                <div className="space-y-2">
+                  {feature.benefits.map((benefit, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${feature.color}`} />
+                      <span className="text-sm text-gray-600 font-medium">{benefit}</span>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
-          </Link>
-        </motion.div>
-      ))}
-    </motion.div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </motion.section>
   );
 }

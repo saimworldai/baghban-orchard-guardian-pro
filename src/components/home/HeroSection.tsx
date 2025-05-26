@@ -1,101 +1,128 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { 
-  ArrowRight, 
-  Star, 
-  Sparkles, 
-  CheckCircle, 
-  Shield, 
-  Users, 
-  TrendingUp 
-} from 'lucide-react';
-import { useAuth } from '@/contexts/AuthProvider';
+import { ArrowRight, Sparkles, Play, CheckCircle } from 'lucide-react';
+
+const heroVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.8,
+      ease: "easeOut",
+      staggerChildren: 0.2
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+};
+
+const features = [
+  "AI-powered disease detection",
+  "Real-time weather alerts",
+  "Expert consultation 24/7",
+  "Smart spray scheduling"
+];
 
 export function HeroSection() {
-  const { user } = useAuth();
-
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: -30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1, ease: "easeOut" }}
-      className="flex flex-col items-center justify-center mb-20 text-center relative"
+    <motion.section 
+      variants={heroVariants}
+      initial="hidden"
+      animate="visible"
+      className="text-center mb-20 relative"
+      role="banner"
+      aria-labelledby="hero-title"
     >
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.8, type: "spring" }}
-        className="mb-8"
-      >
-        <Badge variant="outline" className="bg-gradient-to-r from-green-100 via-blue-100 to-purple-100 text-green-800 border-green-200 px-6 py-3 text-base font-semibold shadow-lg">
-          <Sparkles className="w-5 h-5 mr-2" />
-          🌱 Next-Generation Agricultural Intelligence
-        </Badge>
+      <motion.div variants={itemVariants} className="mb-8">
+        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-blue-100 backdrop-blur-md px-6 py-3 rounded-full border border-green-200/50 shadow-lg mb-6">
+          <Sparkles className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-semibold text-green-800">
+            Trusted by 15,000+ farmers worldwide
+          </span>
+        </div>
       </motion.div>
-      
+
       <motion.h1 
-        className="text-7xl sm:text-8xl font-bold bg-gradient-to-br from-green-800 via-emerald-700 to-blue-700 bg-clip-text text-transparent mb-8 leading-tight"
-        initial={{ scale: 0.9 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.6 }}
+        id="hero-title"
+        variants={itemVariants}
+        className="text-5xl md:text-7xl font-bold mb-8 leading-tight"
       >
-        Baghban
+        <span className="bg-gradient-to-r from-green-700 via-emerald-600 to-blue-700 bg-clip-text text-transparent">
+          Smart Orchard
+        </span>
+        <br />
+        <span className="text-gray-800">
+          Management
+        </span>
       </motion.h1>
-      
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.6 }}
+
+      <motion.p 
+        variants={itemVariants}
+        className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed"
       >
-        <p className="text-3xl font-semibold text-green-700 mb-6">Your Intelligent Orchard Guardian</p>
-        <p className="text-xl text-muted-foreground text-center max-w-4xl leading-relaxed mb-8">
-          Transform your apple orchard with cutting-edge AI technology, real-time monitoring, and expert guidance. 
-          Join thousands of farmers who've increased their yield by up to 45% with Baghban's revolutionary platform.
+        Transform your orchard with AI-powered insights, real-time monitoring, 
+        and expert guidance. Increase yields by up to 45% while reducing costs.
+      </motion.p>
+
+      <motion.div variants={itemVariants} className="mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-8">
+          {features.map((feature, index) => (
+            <motion.div
+              key={feature}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
+              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl border border-green-100 shadow-sm"
+            >
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-gray-700">{feature}</span>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      <motion.div 
+        variants={itemVariants}
+        className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+      >
+        <Button 
+          size="lg" 
+          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-12 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group"
+          aria-label="Start your free trial now"
+        >
+          Start Free Trial
+          <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          size="lg"
+          className="border-2 border-gray-300 hover:border-green-500 px-12 py-4 text-lg font-semibold transition-all duration-300 group"
+          aria-label="Watch product demo video"
+        >
+          <Play className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+          Watch Demo
+        </Button>
+      </motion.div>
+
+      <motion.div 
+        variants={itemVariants}
+        className="mt-12 text-sm text-gray-500"
+      >
+        <p>
+          ✓ No credit card required • ✓ 14-day free trial • ✓ Cancel anytime
         </p>
       </motion.div>
-      
-      <motion.div 
-        className="flex flex-wrap justify-center gap-4 mb-12"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, duration: 0.6 }}
-      >
-        {[
-          { icon: CheckCircle, text: "AI-Powered Disease Detection" },
-          { icon: Shield, text: "98% Accuracy Rate" },
-          { icon: Users, text: "Expert Support 24/7" },
-          { icon: TrendingUp, text: "Increase Yield by 45%" }
-        ].map((item, index) => (
-          <div key={index} className="flex items-center bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-md">
-            <item.icon className="w-5 h-5 text-green-600 mr-2" />
-            <span className="text-sm font-medium text-gray-700">{item.text}</span>
-          </div>
-        ))}
-      </motion.div>
-      
-      {!user && (
-        <motion.div 
-          className="flex flex-col sm:flex-row gap-6"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.1, type: "spring", stiffness: 100 }}
-        >
-          <Link to="/auth">
-            <Button size="lg" className="bg-gradient-to-r from-green-600 via-emerald-600 to-green-700 hover:from-green-700 hover:via-emerald-700 hover:to-green-800 shadow-xl hover:shadow-2xl transition-all duration-300 px-10 py-4 text-xl font-bold group transform hover:scale-105">
-              Start Free Trial
-              <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
-            </Button>
-          </Link>
-          <Button variant="outline" size="lg" className="border-2 border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300 px-10 py-4 text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300">
-            <Star className="mr-2 h-5 w-5" />
-            Watch Demo
-          </Button>
-        </motion.div>
-      )}
-    </motion.div>
+    </motion.section>
   );
 }
