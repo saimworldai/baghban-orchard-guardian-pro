@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { TreeDeciduous, Shield, UserCheck, Globe, TrendingUp, Award } from 'lucide-react';
+import { TreeDeciduous, Shield, UserCheck, Globe, TrendingUp, Award, Brain, Zap, Users2, Target, Clock, Star } from 'lucide-react';
 
 const stats = [
   { 
@@ -11,23 +11,26 @@ const stats = [
     icon: TreeDeciduous, 
     color: 'text-green-600',
     bg: 'from-green-100 to-emerald-100',
-    description: 'Worldwide community'
+    description: 'Worldwide community',
+    accent: 'border-green-200'
   },
   { 
     value: '98%', 
     label: 'Disease Detection Accuracy', 
-    icon: Shield, 
-    color: 'text-blue-600',
-    bg: 'from-blue-100 to-cyan-100',
-    description: 'AI-powered precision'
+    icon: Brain, 
+    color: 'text-purple-600',
+    bg: 'from-purple-100 to-violet-100',
+    description: 'AI-powered precision',
+    accent: 'border-purple-200'
   },
   { 
     value: '24/7', 
     label: 'Expert Support', 
-    icon: UserCheck, 
-    color: 'text-purple-600',
-    bg: 'from-purple-100 to-violet-100',
-    description: 'Always available help'
+    icon: Clock, 
+    color: 'text-blue-600',
+    bg: 'from-blue-100 to-cyan-100',
+    description: 'Always available help',
+    accent: 'border-blue-200'
   },
   { 
     value: '45+', 
@@ -35,23 +38,26 @@ const stats = [
     icon: Globe, 
     color: 'text-amber-600',
     bg: 'from-amber-100 to-yellow-100',
-    description: 'Global presence'
+    description: 'Global presence',
+    accent: 'border-amber-200'
   },
   { 
     value: '45%', 
     label: 'Average Yield Increase', 
-    icon: TrendingUp, 
+    icon: Target, 
     color: 'text-emerald-600',
     bg: 'from-emerald-100 to-green-100',
-    description: 'Proven results'
+    description: 'Proven results',
+    accent: 'border-emerald-200'
   },
   { 
     value: '4.9★', 
     label: 'User Rating', 
-    icon: Award, 
+    icon: Star, 
     color: 'text-orange-600',
     bg: 'from-orange-100 to-red-100',
-    description: 'Highly rated platform'
+    description: 'Highly rated platform',
+    accent: 'border-orange-200'
   }
 ];
 
@@ -125,15 +131,21 @@ export function StatsSection() {
       >
         {stats.map((stat, index) => (
           <motion.div key={stat.label} variants={itemVariants}>
-            <Card className="text-center p-6 bg-white/95 backdrop-blur-md border-green-100 hover:shadow-2xl hover:scale-105 transition-all duration-500 group h-full">
+            <Card className={`text-center p-6 bg-white/95 backdrop-blur-md ${stat.accent} border-2 hover:shadow-2xl hover:scale-105 transition-all duration-500 group h-full`}>
               <CardContent className="p-0 flex flex-col items-center justify-between h-full">
                 <div className="w-full">
                   <motion.div 
-                    className={`p-4 bg-gradient-to-br ${stat.bg} rounded-full mb-4 group-hover:scale-110 transition-transform duration-300 mx-auto w-fit`}
+                    className={`p-4 bg-gradient-to-br ${stat.bg} rounded-full mb-4 group-hover:scale-110 transition-transform duration-300 mx-auto w-fit relative overflow-hidden`}
                     whileHover={{ rotate: 10 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   >
-                    <stat.icon className={`h-8 w-8 ${stat.color}`} />
+                    <motion.div
+                      className="absolute inset-0 bg-white/20 rounded-full"
+                      initial={{ scale: 0, opacity: 0 }}
+                      whileHover={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                    <stat.icon className={`h-8 w-8 ${stat.color} relative z-10`} />
                   </motion.div>
                   
                   <CounterAnimation value={stat.value} />

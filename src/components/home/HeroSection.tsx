@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Play, CheckCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Play, CheckCircle, Brain, Shield, Users, Zap } from 'lucide-react';
 
 const heroVariants = {
   hidden: { opacity: 0, y: 50 },
@@ -27,10 +27,30 @@ const itemVariants = {
 };
 
 const features = [
-  "AI-powered disease detection",
-  "Real-time weather alerts",
-  "Expert consultation 24/7",
-  "Smart spray scheduling"
+  {
+    text: "AI-powered disease detection",
+    icon: Brain,
+    color: "text-purple-600",
+    bgColor: "from-purple-100 to-indigo-100"
+  },
+  {
+    text: "Real-time weather alerts",
+    icon: Shield,
+    color: "text-blue-600", 
+    bgColor: "from-blue-100 to-cyan-100"
+  },
+  {
+    text: "Expert consultation 24/7",
+    icon: Users,
+    color: "text-emerald-600",
+    bgColor: "from-emerald-100 to-green-100"
+  },
+  {
+    text: "Smart spray scheduling",
+    icon: Zap,
+    color: "text-amber-600",
+    bgColor: "from-amber-100 to-yellow-100"
+  }
 ];
 
 export function HeroSection() {
@@ -44,8 +64,13 @@ export function HeroSection() {
       aria-labelledby="hero-title"
     >
       <motion.div variants={itemVariants} className="mb-8">
-        <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-blue-100 backdrop-blur-md px-6 py-3 rounded-full border border-green-200/50 shadow-lg mb-6">
-          <Sparkles className="h-4 w-4 text-green-600" />
+        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-100 to-blue-100 backdrop-blur-md px-6 py-3 rounded-full border border-green-200/50 shadow-lg mb-6">
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles className="h-5 w-5 text-green-600" />
+          </motion.div>
           <span className="text-sm font-semibold text-green-800">
             Trusted by 15,000+ farmers worldwide
           </span>
@@ -75,17 +100,23 @@ export function HeroSection() {
       </motion.p>
 
       <motion.div variants={itemVariants} className="mb-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
           {features.map((feature, index) => (
             <motion.div
-              key={feature}
+              key={feature.text}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
-              className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-3 rounded-xl border border-green-100 shadow-sm"
+              className={`flex items-center gap-3 bg-gradient-to-br ${feature.bgColor} backdrop-blur-sm px-4 py-4 rounded-xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 group`}
             >
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">{feature}</span>
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="flex-shrink-0"
+              >
+                <feature.icon className={`h-5 w-5 ${feature.color}`} />
+              </motion.div>
+              <span className="text-sm font-medium text-gray-700 leading-tight">{feature.text}</span>
             </motion.div>
           ))}
         </div>
