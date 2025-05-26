@@ -12,72 +12,83 @@ import {
   Leaf,
   Sun,
   Droplet,
-  BarChart
+  BarChart,
+  ArrowRight,
+  Star,
+  TrendingUp,
+  Shield
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthProvider';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 
 const features = [
   { 
     name: 'Disease Detection', 
     icon: Camera, 
-    description: 'AI-powered image analysis for early detection of common apple tree diseases',
+    description: 'AI-powered image analysis for early detection of common apple tree diseases with 95% accuracy',
     color: 'from-red-500/20 to-orange-500/20',
     textColor: 'text-red-700',
-    link: '/disease-detection'
+    link: '/disease-detection',
+    badge: 'AI Powered'
   },
   { 
     name: 'Weather Alerts', 
     icon: CloudSun, 
-    description: 'Real-time weather forecasts and frost warnings for your orchard location',
+    description: 'Real-time weather forecasts and frost warnings with location-based precision',
     color: 'from-blue-500/20 to-cyan-500/20',
     textColor: 'text-blue-700',
-    link: '/weather-alerts'
+    link: '/weather-alerts',
+    badge: 'Real-time'
   },
   { 
     name: 'Spray Schedule', 
     icon: Sprout, 
-    description: 'Smart spray scheduling system based on disease risk and weather conditions',
+    description: 'Smart spray scheduling system optimized for disease prevention and weather conditions',
     color: 'from-green-500/20 to-emerald-500/20',
     textColor: 'text-green-700',
-    link: '/spray-schedule'
+    link: '/spray-schedule',
+    badge: 'Smart'
   },
   { 
     name: 'Knowledge Hub', 
     icon: BookOpen, 
-    description: 'Comprehensive guides and tutorials for optimal orchard management',
+    description: 'Comprehensive guides and tutorials from agricultural experts worldwide',
     color: 'from-amber-500/20 to-yellow-500/20',
     textColor: 'text-amber-700',
-    link: '#'
+    link: '#',
+    badge: 'Expert Tips'
   },
   { 
     name: 'Expert Consultation', 
     icon: UserCheck, 
-    description: 'Connect with agriculture experts for personalized guidance and advice',
+    description: 'Connect with certified agriculture experts for personalized guidance 24/7',
     color: 'from-purple-500/20 to-violet-500/20',
     textColor: 'text-purple-700',
-    link: '/expert-consultation'
+    link: '/expert-consultation',
+    badge: '24/7 Support'
   },
   { 
     name: 'Shop', 
     icon: ShoppingCart, 
-    description: 'Quality tools, equipment, and supplies for professional orchard care',
+    description: 'Quality tools, equipment, and supplies for professional orchard management',
     color: 'from-teal-500/20 to-cyan-500/20',
     textColor: 'text-teal-700',
-    link: '#'
-  },
-  {
-    name: 'Tree Health',
-    icon: TreeDeciduous,
-    description: 'Comprehensive tree growth and health monitoring',
-    color: 'from-green-500/20 to-emerald-500/20',
-    textColor: 'text-green-700',
-    link: '#'
+    link: '#',
+    badge: 'Premium Quality'
   }
 ];
 
-// Animation variants for staggered animations
+const stats = [
+  { value: '10K+', label: 'Happy Farmers', icon: TreeDeciduous },
+  { value: '95%', label: 'Disease Detection Accuracy', icon: Shield },
+  { value: '24/7', label: 'Expert Support', icon: UserCheck },
+  { value: '30+', label: 'Countries Served', icon: Star }
+];
+
+// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -93,168 +104,218 @@ const itemVariants = {
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
 };
 
+const floatingVariants = {
+  floating: {
+    y: [0, -20, 0],
+    transition: {
+      duration: 6,
+      repeat: Infinity,
+      ease: "easeInOut"
+    }
+  }
+};
+
 const Index = () => {
   const { user } = useAuth();
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Background elements with improved styling */}
-      <div className="absolute inset-0 bg-white/40 backdrop-blur-md -z-10"></div>
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBmaWxsPSIjMDAwIiBmaWxsLW9wYWNpdHk9Ii4wNSIgZD0iTTk5IDEzOWMtNDAuMzE4IDAtNzMtMzIuNjgyLTczLTczUzU4LjY4Mi03IDk5LTdjNDAuMzE4IDAgNzMgMzIuNjgyIDczIDczcy0zMi42ODIgNzMtNzMgNzN6bTAtMTBjMzQuNzQyIDAgNjMtMjguMjU4IDYzLTYzUzEzMy43NDIgMTcgOTkgMTcgMzYgNDUuMjU4IDM2IDgwczI4LjI1OCA2MyA2MyA2M3oiLz48cGF0aCBkPSJNMTE1IDExNWE4IDggMCAxMCAwLTE2IDggOCAwIDAwMCAxNnoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjA1Ii8+PC9nPjwvc3ZnPg==')] bg-repeat opacity-10 -z-10"></div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 relative overflow-hidden">
+      {/* Enhanced background elements */}
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm -z-10"></div>
+      
+      {/* Animated background patterns */}
+      <div className="absolute inset-0 opacity-20 -z-10">
+        <motion.div 
+          className="absolute top-20 left-10"
+          variants={floatingVariants}
+          animate="floating"
+        >
+          <TreeDeciduous size={100} className="text-green-600 opacity-30" />
+        </motion.div>
+        <motion.div 
+          className="absolute top-40 right-20"
+          variants={floatingVariants}
+          animate="floating"
+          transition={{ delay: 1 }}
+        >
+          <Leaf size={80} className="text-emerald-500 opacity-40" />
+        </motion.div>
+        <motion.div 
+          className="absolute bottom-20 left-20"
+          variants={floatingVariants}
+          animate="floating"
+          transition={{ delay: 2 }}
+        >
+          <Sun size={90} className="text-yellow-500 opacity-30" />
+        </motion.div>
+      </div>
       
       <div className="container mx-auto px-4 py-12">
+        {/* Hero Section */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col items-center justify-center mb-12 relative"
+          transition={{ duration: 0.8 }}
+          className="flex flex-col items-center justify-center mb-16 text-center relative"
         >
-          <div className="absolute -z-10 opacity-20">
-            <motion.div
-              animate={{ 
-                rotate: [0, 5, 0, -5, 0],
-                y: [0, -5, 0, 5, 0]
-              }}
-              transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
-            >
-              <TreeDeciduous size={120} className="text-green-600" />
-            </motion.div>
-            <motion.div
-              animate={{ 
-                rotate: [0, -5, 0, 5, 0],
-                y: [0, 5, 0, -5, 0]
-              }}
-              transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
-            >
-              <TreeDeciduous size={80} className="text-green-700 absolute -right-20 top-10" />
-            </motion.div>
-            <motion.div
-              animate={{ 
-                rotate: [0, 15, 0, -15, 0], 
-              }}
-              transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-            >
-              <Leaf size={60} className="text-green-500 absolute -left-16 top-16" />
-            </motion.div>
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-            >
-              <Droplet size={40} className="text-blue-500 absolute right-10 -top-10" />
-            </motion.div>
-            <motion.div
-              animate={{ 
-                scale: [1, 1.1, 1],
-                opacity: [0.8, 1, 0.8]
-              }}
-              transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-            >
-              <Sun size={50} className="text-yellow-500 absolute -left-24 -top-5" />
-            </motion.div>
-          </div>
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="mb-6"
+          >
+            <Badge variant="outline" className="bg-gradient-to-r from-green-100 to-blue-100 text-green-800 border-green-200 px-4 py-2 text-sm font-medium">
+              🌱 Advanced Agricultural Technology
+            </Badge>
+          </motion.div>
           
-          <h1 className="text-5xl sm:text-6xl font-bold bg-gradient-to-br from-green-800 to-blue-700 bg-clip-text text-transparent mb-6 text-center drop-shadow-sm">
-            Baghban: Your Orchard Guardian
+          <h1 className="text-6xl sm:text-7xl font-bold bg-gradient-to-br from-green-800 via-emerald-700 to-blue-700 bg-clip-text text-transparent mb-6 leading-tight">
+            Baghban
           </h1>
-          <p className="text-xl text-muted-foreground text-center max-w-2xl">
-            Smart solutions for apple orchard management with advanced AI-powered tools
+          <p className="text-2xl font-medium text-green-700 mb-4">Your Intelligent Orchard Guardian</p>
+          <p className="text-lg text-muted-foreground text-center max-w-3xl leading-relaxed">
+            Transform your apple orchard with cutting-edge AI technology, real-time monitoring, and expert guidance. 
+            Join thousands of farmers who've increased their yield by up to 40% with Baghban.
           </p>
           
           {!user && (
             <motion.div 
-              className="mt-8"
+              className="mt-8 flex flex-col sm:flex-row gap-4"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, type: "spring" }}
+              transition={{ delay: 0.6, type: "spring" }}
             >
               <Link to="/auth">
-                <Button size="lg" className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 shadow-md hover:shadow-lg transition-all">
-                  Get Started
+                <Button size="lg" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transition-all px-8 py-3 text-lg font-semibold group">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
+              <Button variant="outline" size="lg" className="border-green-200 text-green-700 hover:bg-green-50 px-8 py-3 text-lg font-semibold">
+                Watch Demo
+              </Button>
             </motion.div>
           )}
         </motion.div>
 
+        {/* Stats Section */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12"
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
         >
-          {features.map((feature) => (
-            <motion.div key={feature.name} variants={itemVariants}>
-              <Link 
-                to={feature.link} 
-                className="group"
-              >
-                <div className="relative overflow-hidden rounded-xl transition-all duration-300 group-hover:translate-y-[-5px] group-hover:shadow-xl bg-white bg-opacity-80 backdrop-blur-sm border border-primary/10 p-8 h-full">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} -z-10 opacity-40 group-hover:opacity-60 transition-opacity`}></div>
-                  <div className="mb-6 p-4 rounded-full bg-primary/10 inline-flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    <feature.icon 
-                      size={32} 
-                      className={`${feature.textColor} group-hover:scale-110 transition-all`} 
-                    />
+          {stats.map((stat, index) => (
+            <motion.div key={stat.label} variants={itemVariants}>
+              <Card className="text-center p-6 bg-white/80 backdrop-blur-sm border-green-100 hover:shadow-lg transition-all">
+                <CardContent className="p-0">
+                  <div className="flex flex-col items-center">
+                    <stat.icon className="h-8 w-8 text-green-600 mb-2" />
+                    <div className="text-3xl font-bold text-green-800">{stat.value}</div>
+                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
                   </div>
-                  <h3 className={`text-xl font-semibold mb-2 group-hover:${feature.textColor} transition-colors`}>{feature.name}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Features Grid */}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
+        >
+          {features.map((feature, index) => (
+            <motion.div key={feature.name} variants={itemVariants}>
+              <Link to={feature.link} className="group block h-full">
+                <Card className="relative overflow-hidden transition-all duration-300 group-hover:translate-y-[-8px] group-hover:shadow-2xl bg-white/90 backdrop-blur-sm border-primary/10 h-full">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-50 group-hover:opacity-70 transition-opacity`}></div>
+                  <CardContent className="relative p-8 h-full flex flex-col">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-3 rounded-xl bg-white/80 shadow-md group-hover:scale-110 transition-transform">
+                        <feature.icon size={32} className={`${feature.textColor}`} />
+                      </div>
+                      <Badge variant="secondary" className="bg-white/80 text-gray-700 text-xs">
+                        {feature.badge}
+                      </Badge>
+                    </div>
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-gray-800 transition-colors">
+                      {feature.name}
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed flex-grow">{feature.description}</p>
+                    <div className="mt-4 flex items-center text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                      Learn more 
+                      <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
             </motion.div>
           ))}
         </motion.div>
         
+        {/* Enhanced CTA Section */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-16 bg-white/60 backdrop-blur-sm rounded-xl p-8 border border-green-100 shadow-md"
+          transition={{ delay: 0.8, duration: 0.8 }}
+          className="bg-gradient-to-r from-green-600 to-blue-600 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden"
         >
-          <div className="flex flex-col md:flex-row gap-8 items-center">
-            <div className="relative w-full md:w-1/2">
-              <motion.div 
-                initial="hidden"
-                animate="show"
-                variants={containerVariants}
-                className="grid grid-cols-2 gap-4"
-              >
-                <motion.div variants={itemVariants} className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg flex flex-col items-center justify-center text-green-700 h-40 hover:shadow-md transition-shadow">
-                  <CalendarDays size={40} className="mb-2" />
-                  <h3 className="text-lg font-semibold">Seasonal Tips</h3>
-                  <p className="text-sm text-center">Timely advice for each season</p>
-                </motion.div>
-                <motion.div variants={itemVariants} className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg flex flex-col items-center justify-center text-blue-700 h-40 hover:shadow-md transition-shadow">
-                  <Droplet size={40} className="mb-2" />
-                  <h3 className="text-lg font-semibold">Water Management</h3>
-                  <p className="text-sm text-center">Irrigation planning & tracking</p>
-                </motion.div>
-                <motion.div variants={itemVariants} className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg flex flex-col items-center justify-center text-amber-700 h-40 hover:shadow-md transition-shadow">
-                  <BarChart size={40} className="mb-2" />
-                  <h3 className="text-lg font-semibold">Yield Tracking</h3>
-                  <p className="text-sm text-center">Monitor & improve production</p>
-                </motion.div>
-                <motion.div variants={itemVariants} className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg flex flex-col items-center justify-center text-purple-700 h-40 hover:shadow-md transition-shadow">
-                  <TreeDeciduous size={40} className="mb-2" />
-                  <h3 className="text-lg font-semibold">Growth Analysis</h3>
-                  <p className="text-sm text-center">Track tree health & growth</p>
-                </motion.div>
-              </motion.div>
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="relative z-10 flex flex-col lg:flex-row items-center gap-8">
+            <div className="flex-1 text-center lg:text-left">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Ready to Transform Your Orchard?
+              </h2>
+              <p className="text-lg text-green-100 mb-6 max-w-2xl">
+                Join over 10,000 farmers worldwide who trust Baghban for smarter orchard management. 
+                Start your free trial today and see results within the first week.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button size="lg" className="bg-white text-green-700 hover:bg-gray-100 shadow-lg font-semibold px-8 py-3">
+                  Start Free Trial
+                </Button>
+                <Button variant="outline" size="lg" className="border-white text-white hover:bg-white/10 font-semibold px-8 py-3">
+                  Schedule Demo
+                </Button>
+              </div>
             </div>
             
-            <div className="w-full md:w-1/2">
-              <h2 className="text-3xl font-bold bg-gradient-to-br from-green-800 to-blue-700 bg-clip-text text-transparent mb-4">
-                Complete Orchard Management
-              </h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Our comprehensive suite of tools helps you manage every aspect of your apple orchard, 
-                from disease detection to harvest planning. Stay ahead with data-driven insights and 
-                expert recommendations tailored to your specific needs.
-              </p>
-              <Button 
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
+            <div className="grid grid-cols-2 gap-4 lg:w-80">
+              <motion.div 
+                className="bg-white/20 backdrop-blur-sm p-4 rounded-xl text-center"
+                whileHover={{ scale: 1.05 }}
               >
-                Explore All Features
-              </Button>
+                <TrendingUp className="h-8 w-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">40%</div>
+                <div className="text-sm text-green-100">Yield Increase</div>
+              </motion.div>
+              <motion.div 
+                className="bg-white/20 backdrop-blur-sm p-4 rounded-xl text-center"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Shield className="h-8 w-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">99%</div>
+                <div className="text-sm text-green-100">Uptime</div>
+              </motion.div>
+              <motion.div 
+                className="bg-white/20 backdrop-blur-sm p-4 rounded-xl text-center"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Star className="h-8 w-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">4.9</div>
+                <div className="text-sm text-green-100">User Rating</div>
+              </motion.div>
+              <motion.div 
+                className="bg-white/20 backdrop-blur-sm p-4 rounded-xl text-center"
+                whileHover={{ scale: 1.05 }}
+              >
+                <CalendarDays className="h-8 w-8 mx-auto mb-2" />
+                <div className="text-2xl font-bold">24/7</div>
+                <div className="text-sm text-green-100">Support</div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
