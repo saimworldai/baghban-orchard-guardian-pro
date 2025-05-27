@@ -22,7 +22,10 @@ import {
   Download,
   PieChart,
   Cpu,
-  ArrowRight
+  ArrowRight,
+  CheckCircle,
+  Star,
+  Sparkles
 } from 'lucide-react';
 
 const features = [
@@ -35,6 +38,7 @@ const features = [
     color: "from-purple-500 to-indigo-500",
     bgColor: "from-purple-50 to-indigo-50",
     accentColor: "border-purple-200",
+    thumbnailBg: "from-purple-500 to-indigo-600",
     link: "/disease-detection"
   },
   {
@@ -46,6 +50,7 @@ const features = [
     color: "from-blue-500 to-cyan-500",
     bgColor: "from-blue-50 to-cyan-50",
     accentColor: "border-blue-200",
+    thumbnailBg: "from-blue-500 to-cyan-600",
     link: "/weather-alerts"
   },
   {
@@ -57,6 +62,7 @@ const features = [
     color: "from-emerald-500 to-teal-500",
     bgColor: "from-emerald-50 to-teal-50",
     accentColor: "border-emerald-200",
+    thumbnailBg: "from-emerald-500 to-teal-600",
     link: "/expert-consultation"
   },
   {
@@ -68,6 +74,7 @@ const features = [
     color: "from-amber-500 to-orange-500",
     bgColor: "from-amber-50 to-orange-50",
     accentColor: "border-amber-200",
+    thumbnailBg: "from-amber-500 to-orange-600",
     link: "/spray-schedule"
   },
   {
@@ -79,6 +86,7 @@ const features = [
     color: "from-green-500 to-emerald-500",
     bgColor: "from-green-50 to-emerald-50",
     accentColor: "border-green-200",
+    thumbnailBg: "from-green-500 to-emerald-600",
     link: "/profile"
   },
   {
@@ -90,6 +98,7 @@ const features = [
     color: "from-red-500 to-pink-500",
     bgColor: "from-red-50 to-pink-50",
     accentColor: "border-red-200",
+    thumbnailBg: "from-red-500 to-pink-600",
     link: "/weather-alerts"
   },
   {
@@ -101,6 +110,7 @@ const features = [
     color: "from-indigo-500 to-purple-500",
     bgColor: "from-indigo-50 to-purple-50",
     accentColor: "border-indigo-200",
+    thumbnailBg: "from-indigo-500 to-purple-600",
     link: "/disease-detection"
   },
   {
@@ -112,6 +122,7 @@ const features = [
     color: "from-slate-500 to-gray-500",
     bgColor: "from-slate-50 to-gray-50",
     accentColor: "border-slate-200",
+    thumbnailBg: "from-slate-500 to-gray-600",
     link: "/profile"
   },
   {
@@ -123,6 +134,7 @@ const features = [
     color: "from-yellow-500 to-amber-500",
     bgColor: "from-yellow-50 to-amber-50",
     accentColor: "border-yellow-200",
+    thumbnailBg: "from-yellow-500 to-amber-600",
     link: "/spray-schedule"
   }
 ];
@@ -206,26 +218,60 @@ export function FeaturesGrid() {
             <Card className={`h-full bg-white/90 backdrop-blur-md ${feature.accentColor} border-2 hover:shadow-2xl transition-all duration-500 overflow-hidden relative`}>
               <div className={`h-2 bg-gradient-to-r ${feature.color}`} />
               
-              <CardHeader className="pb-4">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.bgColor} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 relative overflow-hidden`}>
-                  <motion.div
-                    className="absolute inset-0 bg-white/20 rounded-2xl"
-                    initial={{ scale: 0, opacity: 0 }}
-                    whileHover={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <div className="relative z-10 flex items-center justify-center">
-                    <feature.icon className={`h-6 w-6 bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`} />
+              {/* Thumbnail Section */}
+              <div className="p-6 pb-0">
+                <div className={`h-32 w-full rounded-xl bg-gradient-to-br ${feature.thumbnailBg} relative overflow-hidden mb-6 group-hover:scale-105 transition-transform duration-300`}>
+                  {/* Background elements */}
+                  <div className="absolute inset-0 bg-white/10"></div>
+                  <div className="absolute top-3 right-3 w-6 h-6 bg-white/20 rounded-full"></div>
+                  <div className="absolute bottom-3 left-3 w-4 h-4 bg-white/15 rounded-full"></div>
+                  
+                  {/* Main content */}
+                  <div className="absolute inset-0 flex items-center justify-center">
                     <motion.div
-                      className="absolute -top-1 -right-1"
-                      initial={{ scale: 0, opacity: 0 }}
-                      whileHover={{ scale: 1, opacity: 1 }}
-                      transition={{ delay: 0.1, duration: 0.2 }}
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="relative"
                     >
-                      <feature.secondaryIcon className={`h-3 w-3 bg-gradient-to-r ${feature.color} bg-clip-text text-transparent`} />
+                      <feature.icon className="h-12 w-12 text-white drop-shadow-lg" />
+                      <motion.div
+                        className="absolute -top-1 -right-1"
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileHover={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        <feature.secondaryIcon className="h-4 w-4 text-white/80" />
+                      </motion.div>
                     </motion.div>
                   </div>
+                  
+                  {/* Quality badge */}
+                  <div className="absolute top-2 left-2">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="bg-white/90 rounded-full p-1"
+                    >
+                      <Star className="w-3 h-3 text-yellow-500 fill-current" />
+                    </motion.div>
+                  </div>
+                  
+                  {/* Floating particles */}
+                  <motion.div
+                    animate={{ y: [0, -10, 0], opacity: [0.4, 0.8, 0.4] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute top-6 right-8 w-1 h-1 bg-white/50 rounded-full"
+                  />
+                  <motion.div
+                    animate={{ y: [0, -8, 0], opacity: [0.3, 0.7, 0.3] }}
+                    transition={{ duration: 2.5, repeat: Infinity, delay: 1 }}
+                    className="absolute bottom-8 right-6 w-1.5 h-1.5 bg-white/40 rounded-full"
+                  />
                 </div>
+              </div>
+              
+              <CardHeader className="pb-4 pt-0">
                 <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors flex items-center justify-between">
                   {feature.title}
                   <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />

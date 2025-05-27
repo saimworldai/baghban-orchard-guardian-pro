@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, Award, Zap, LeafyGreen, BarChart3, Shield, Clock } from 'lucide-react';
+import { TrendingUp, Users, Award, Zap, LeafyGreen, BarChart3, Shield, Clock, Star, CheckCircle } from 'lucide-react';
 
 const stats = [
   {
@@ -10,7 +9,8 @@ const stats = [
     label: "Active Farmers",
     description: "Trust our platform",
     color: "from-blue-500 to-cyan-500",
-    bgColor: "from-blue-50 to-cyan-50"
+    bgColor: "from-blue-50 to-cyan-50",
+    thumbnailBg: "from-blue-500 to-cyan-600"
   },
   {
     icon: TrendingUp,
@@ -18,7 +18,8 @@ const stats = [
     label: "Yield Increase",
     description: "Average improvement",
     color: "from-green-500 to-emerald-500",
-    bgColor: "from-green-50 to-emerald-50"
+    bgColor: "from-green-50 to-emerald-50",
+    thumbnailBg: "from-green-500 to-emerald-600"
   },
   {
     icon: Award,
@@ -26,7 +27,8 @@ const stats = [
     label: "Disease Detection",
     description: "Accuracy rate",
     color: "from-purple-500 to-indigo-500",
-    bgColor: "from-purple-50 to-indigo-50"
+    bgColor: "from-purple-50 to-indigo-50",
+    thumbnailBg: "from-purple-500 to-indigo-600"
   },
   {
     icon: Clock,
@@ -34,7 +36,8 @@ const stats = [
     label: "Expert Support",
     description: "Always available",
     color: "from-amber-500 to-orange-500",
-    bgColor: "from-amber-50 to-orange-50"
+    bgColor: "from-amber-50 to-orange-50",
+    thumbnailBg: "from-amber-500 to-orange-600"
   }
 ];
 
@@ -109,13 +112,35 @@ export function StatsSection() {
             }}
             className="text-center group"
           >
-            <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-              <motion.div
-                whileHover={{ rotate: 10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <stat.icon className={`h-8 w-8 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`} />
-              </motion.div>
+            {/* Thumbnail */}
+            <div className="relative mb-6 mx-auto">
+              <div className={`w-24 h-24 mx-auto rounded-2xl bg-gradient-to-br ${stat.thumbnailBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg relative overflow-hidden`}>
+                {/* Background pattern */}
+                <div className="absolute inset-0 bg-white/10"></div>
+                <div className="absolute top-1 right-1 w-3 h-3 bg-white/20 rounded-full"></div>
+                <div className="absolute bottom-1 left-1 w-2 h-2 bg-white/15 rounded-full"></div>
+                
+                {/* Main icon */}
+                <motion.div
+                  whileHover={{ rotate: 10, scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative z-10"
+                >
+                  <stat.icon className="h-10 w-10 text-white drop-shadow-lg" />
+                </motion.div>
+                
+                {/* Success indicator */}
+                <div className="absolute -top-1 -right-1">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                    className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg"
+                  >
+                    <CheckCircle className="w-3 h-3 text-white" />
+                  </motion.div>
+                </div>
+              </div>
             </div>
             
             <motion.div

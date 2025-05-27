@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles, Play, CheckCircle, Brain, Shield, Users, Zap } from 'lucide-react';
+import { ArrowRight, Sparkles, Play, CheckCircle, Brain, Shield, Users, Zap, Scan, CloudRain, MessageCircle, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const heroVariants = {
@@ -31,29 +30,37 @@ const features = [
   {
     text: "AI-powered disease detection",
     icon: Brain,
+    secondaryIcon: Scan,
     color: "text-purple-600",
     bgColor: "from-purple-100 to-indigo-100",
+    thumbnailBg: "from-purple-500 to-indigo-600",
     link: "/disease-detection"
   },
   {
     text: "Real-time weather alerts",
-    icon: Shield,
+    icon: CloudRain,
+    secondaryIcon: Shield,
     color: "text-blue-600", 
     bgColor: "from-blue-100 to-cyan-100",
+    thumbnailBg: "from-blue-500 to-cyan-600",
     link: "/weather-alerts"
   },
   {
     text: "Expert consultation 24/7",
     icon: Users,
+    secondaryIcon: MessageCircle,
     color: "text-emerald-600",
     bgColor: "from-emerald-100 to-green-100",
+    thumbnailBg: "from-emerald-500 to-green-600",
     link: "/expert-consultation"
   },
   {
     text: "Smart spray scheduling",
-    icon: Zap,
+    icon: Calendar,
+    secondaryIcon: Zap,
     color: "text-amber-600",
     bgColor: "from-amber-100 to-yellow-100",
+    thumbnailBg: "from-amber-500 to-yellow-600",
     link: "/spray-schedule"
   }
 ];
@@ -123,26 +130,74 @@ export function HeroSection() {
       </motion.p>
 
       <motion.div variants={itemVariants} className="mb-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto mb-8">
           {features.map((feature, index) => (
             <motion.div
               key={feature.text}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
-              className={`flex items-center gap-3 bg-gradient-to-br ${feature.bgColor} backdrop-blur-sm px-4 py-4 rounded-xl border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer`}
+              className="group cursor-pointer"
               onClick={() => handleFeatureClick(feature.link)}
-              whileHover={{ scale: 1.05, y: -2 }}
+              whileHover={{ scale: 1.05, y: -4 }}
               whileTap={{ scale: 0.98 }}
             >
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                transition={{ type: "spring", stiffness: 300 }}
-                className="flex-shrink-0"
-              >
-                <feature.icon className={`h-5 w-5 ${feature.color}`} />
-              </motion.div>
-              <span className="text-sm font-medium text-gray-700 leading-tight group-hover:text-gray-900 transition-colors">{feature.text}</span>
+              {/* Thumbnail Container */}
+              <div className="relative overflow-hidden rounded-2xl mb-4 shadow-lg group-hover:shadow-2xl transition-all duration-500">
+                {/* Background Gradient */}
+                <div className={`h-32 w-full bg-gradient-to-br ${feature.thumbnailBg} relative`}>
+                  {/* Decorative Elements */}
+                  <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+                  <div className="absolute top-2 right-2 w-8 h-8 bg-white/20 rounded-full"></div>
+                  <div className="absolute bottom-2 left-2 w-6 h-6 bg-white/15 rounded-full"></div>
+                  
+                  {/* Main Icon */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <motion.div
+                      whileHover={{ scale: 1.2, rotate: 10 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="relative"
+                    >
+                      <feature.icon className="h-12 w-12 text-white drop-shadow-lg" />
+                      {/* Secondary Icon */}
+                      <motion.div
+                        className="absolute -top-1 -right-1"
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileHover={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        <feature.secondaryIcon className="h-5 w-5 text-white/80" />
+                      </motion.div>
+                    </motion.div>
+                  </div>
+                  
+                  {/* Floating particles */}
+                  <div className="absolute top-4 left-4">
+                    <motion.div
+                      animate={{ y: [0, -8, 0], opacity: [0.6, 1, 0.6] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="w-2 h-2 bg-white/40 rounded-full"
+                    />
+                  </div>
+                  <div className="absolute bottom-6 right-6">
+                    <motion.div
+                      animate={{ y: [0, -6, 0], opacity: [0.4, 0.8, 0.4] }}
+                      transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+                      className="w-1.5 h-1.5 bg-white/30 rounded-full"
+                    />
+                  </div>
+                </div>
+                
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 rounded-2xl"></div>
+              </div>
+
+              {/* Text Content */}
+              <div className={`bg-gradient-to-br ${feature.bgColor} backdrop-blur-sm px-4 py-4 rounded-xl border border-white/50 shadow-md group-hover:shadow-lg transition-all duration-300`}>
+                <span className="text-sm font-medium text-gray-700 leading-tight group-hover:text-gray-900 transition-colors block">
+                  {feature.text}
+                </span>
+              </div>
             </motion.div>
           ))}
         </div>
