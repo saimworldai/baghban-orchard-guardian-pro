@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Brain, 
   CloudRain, 
@@ -20,7 +21,8 @@ import {
   Lock,
   Download,
   PieChart,
-  Cpu
+  Cpu,
+  ArrowRight
 } from 'lucide-react';
 
 const features = [
@@ -32,7 +34,8 @@ const features = [
     benefits: ["Instant diagnosis", "Treatment plans", "Prevention tips"],
     color: "from-purple-500 to-indigo-500",
     bgColor: "from-purple-50 to-indigo-50",
-    accentColor: "border-purple-200"
+    accentColor: "border-purple-200",
+    link: "/disease-detection"
   },
   {
     icon: CloudRain,
@@ -42,7 +45,8 @@ const features = [
     benefits: ["7-day forecasts", "Smart alerts", "Irrigation guidance"],
     color: "from-blue-500 to-cyan-500",
     bgColor: "from-blue-50 to-cyan-50",
-    accentColor: "border-blue-200"
+    accentColor: "border-blue-200",
+    link: "/weather-alerts"
   },
   {
     icon: Users,
@@ -52,7 +56,8 @@ const features = [
     benefits: ["24/7 availability", "Certified experts", "Multi-language support"],
     color: "from-emerald-500 to-teal-500",
     bgColor: "from-emerald-50 to-teal-50",
-    accentColor: "border-emerald-200"
+    accentColor: "border-emerald-200",
+    link: "/expert-consultation"
   },
   {
     icon: Calendar,
@@ -62,7 +67,8 @@ const features = [
     benefits: ["Weather integration", "Cost optimization", "Automated reminders"],
     color: "from-amber-500 to-orange-500",
     bgColor: "from-amber-50 to-orange-50",
-    accentColor: "border-amber-200"
+    accentColor: "border-amber-200",
+    link: "/spray-schedule"
   },
   {
     icon: TrendingUp,
@@ -72,7 +78,8 @@ const features = [
     benefits: ["Performance tracking", "Yield predictions", "ROI analysis"],
     color: "from-green-500 to-emerald-500",
     bgColor: "from-green-50 to-emerald-50",
-    accentColor: "border-green-200"
+    accentColor: "border-green-200",
+    link: "/profile"
   },
   {
     icon: Shield,
@@ -82,7 +89,8 @@ const features = [
     benefits: ["Early warnings", "Risk assessment", "Insurance support"],
     color: "from-red-500 to-pink-500",
     bgColor: "from-red-50 to-pink-50",
-    accentColor: "border-red-200"
+    accentColor: "border-red-200",
+    link: "/weather-alerts"
   },
   {
     icon: Smartphone,
@@ -92,7 +100,8 @@ const features = [
     benefits: ["Offline capability", "GPS tracking", "Photo sync"],
     color: "from-indigo-500 to-purple-500",
     bgColor: "from-indigo-50 to-purple-50",
-    accentColor: "border-indigo-200"
+    accentColor: "border-indigo-200",
+    link: "/disease-detection"
   },
   {
     icon: BarChart3,
@@ -102,7 +111,8 @@ const features = [
     benefits: ["Custom reports", "Export data", "Trend analysis"],
     color: "from-slate-500 to-gray-500",
     bgColor: "from-slate-50 to-gray-50",
-    accentColor: "border-slate-200"
+    accentColor: "border-slate-200",
+    link: "/profile"
   },
   {
     icon: Zap,
@@ -112,7 +122,8 @@ const features = [
     benefits: ["IoT integration", "Smart sensors", "Automated workflows"],
     color: "from-yellow-500 to-amber-500",
     bgColor: "from-yellow-50 to-amber-50",
-    accentColor: "border-yellow-200"
+    accentColor: "border-yellow-200",
+    link: "/spray-schedule"
   }
 ];
 
@@ -142,8 +153,15 @@ const cardVariants = {
 };
 
 export function FeaturesGrid() {
+  const navigate = useNavigate();
+
+  const handleFeatureClick = (link: string) => {
+    navigate(link);
+  };
+
   return (
     <motion.section 
+      id="features-section"
       className="mb-20"
       initial="hidden"
       whileInView="visible"
@@ -183,8 +201,9 @@ export function FeaturesGrid() {
               transition: { type: "spring", stiffness: 300 }
             }}
             className="group cursor-pointer"
+            onClick={() => handleFeatureClick(feature.link)}
           >
-            <Card className={`h-full bg-white/90 backdrop-blur-md ${feature.accentColor} border-2 hover:shadow-2xl transition-all duration-500 overflow-hidden`}>
+            <Card className={`h-full bg-white/90 backdrop-blur-md ${feature.accentColor} border-2 hover:shadow-2xl transition-all duration-500 overflow-hidden relative`}>
               <div className={`h-2 bg-gradient-to-r ${feature.color}`} />
               
               <CardHeader className="pb-4">
@@ -207,8 +226,9 @@ export function FeaturesGrid() {
                     </motion.div>
                   </div>
                 </div>
-                <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors">
+                <CardTitle className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors flex items-center justify-between">
                   {feature.title}
+                  <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                 </CardTitle>
               </CardHeader>
 
@@ -230,6 +250,12 @@ export function FeaturesGrid() {
                       <span className="text-sm text-gray-600 font-medium">{benefit}</span>
                     </motion.div>
                   ))}
+                </div>
+
+                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r ${feature.color} flex items-center justify-center`}>
+                    <ArrowRight className="h-4 w-4 text-white" />
+                  </div>
                 </div>
               </CardContent>
             </Card>

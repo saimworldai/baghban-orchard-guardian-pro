@@ -1,187 +1,161 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { TreeDeciduous, Shield, UserCheck, Globe, TrendingUp, Award, Brain, Zap, Users2, Target, Clock, Star } from 'lucide-react';
+import { TrendingUp, Users, Award, Zap, LeafyGreen, BarChart3, Shield, Clock } from 'lucide-react';
 
 const stats = [
-  { 
-    value: '15K+', 
-    label: 'Happy Farmers', 
-    icon: TreeDeciduous, 
-    color: 'text-green-600',
-    bg: 'from-green-100 to-emerald-100',
-    description: 'Worldwide community',
-    accent: 'border-green-200'
+  {
+    icon: Users,
+    number: "15,000+",
+    label: "Active Farmers",
+    description: "Trust our platform",
+    color: "from-blue-500 to-cyan-500",
+    bgColor: "from-blue-50 to-cyan-50"
   },
-  { 
-    value: '98%', 
-    label: 'Disease Detection Accuracy', 
-    icon: Brain, 
-    color: 'text-purple-600',
-    bg: 'from-purple-100 to-violet-100',
-    description: 'AI-powered precision',
-    accent: 'border-purple-200'
+  {
+    icon: TrendingUp,
+    number: "45%",
+    label: "Yield Increase",
+    description: "Average improvement",
+    color: "from-green-500 to-emerald-500",
+    bgColor: "from-green-50 to-emerald-50"
   },
-  { 
-    value: '24/7', 
-    label: 'Expert Support', 
-    icon: Clock, 
-    color: 'text-blue-600',
-    bg: 'from-blue-100 to-cyan-100',
-    description: 'Always available help',
-    accent: 'border-blue-200'
+  {
+    icon: Award,
+    number: "98%",
+    label: "Disease Detection",
+    description: "Accuracy rate",
+    color: "from-purple-500 to-indigo-500",
+    bgColor: "from-purple-50 to-indigo-50"
   },
-  { 
-    value: '45+', 
-    label: 'Countries Served', 
-    icon: Globe, 
-    color: 'text-amber-600',
-    bg: 'from-amber-100 to-yellow-100',
-    description: 'Global presence',
-    accent: 'border-amber-200'
-  },
-  { 
-    value: '45%', 
-    label: 'Average Yield Increase', 
-    icon: Target, 
-    color: 'text-emerald-600',
-    bg: 'from-emerald-100 to-green-100',
-    description: 'Proven results',
-    accent: 'border-emerald-200'
-  },
-  { 
-    value: '4.9★', 
-    label: 'User Rating', 
-    icon: Star, 
-    color: 'text-orange-600',
-    bg: 'from-orange-100 to-red-100',
-    description: 'Highly rated platform',
-    accent: 'border-orange-200'
+  {
+    icon: Clock,
+    number: "24/7",
+    label: "Expert Support",
+    description: "Always available",
+    color: "from-amber-500 to-orange-500",
+    bgColor: "from-amber-50 to-orange-50"
   }
 ];
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  show: {
+  visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.2
+      staggerChildren: 0.2,
+      delayChildren: 0.1
     }
   }
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 40, scale: 0.9 },
-  show: { 
-    opacity: 1, 
-    y: 0, 
+const statVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    y: 0,
     scale: 1,
-    transition: { 
-      type: "spring", 
-      stiffness: 120,
-      damping: 20,
-      mass: 1
-    } 
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 15
+    }
   }
-};
-
-const CounterAnimation = ({ value }: { value: string }) => {
-  return (
-    <motion.div
-      initial={{ scale: 0.5, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 200, 
-        damping: 15,
-        delay: 0.5
-      }}
-      className="text-4xl font-bold bg-gradient-to-r from-green-700 to-blue-700 bg-clip-text text-transparent"
-    >
-      {value}
-    </motion.div>
-  );
 };
 
 export function StatsSection() {
   return (
     <motion.section 
-      className="mb-20"
+      className="mb-24"
       initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-50px" }}
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
       variants={containerVariants}
-      role="region"
-      aria-labelledby="stats-title"
     >
-      <motion.div variants={itemVariants} className="text-center mb-12">
-        <h2 id="stats-title" className="text-3xl font-bold text-gray-800 mb-4">
-          Trusted by Farmers Worldwide
-        </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Join thousands of successful farmers who have transformed their orchards with our platform
-        </p>
-      </motion.div>
+      <div className="text-center mb-16">
+        <motion.div
+          variants={statVariants}
+          className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-blue-100 px-4 py-2 rounded-full mb-6"
+        >
+          <BarChart3 className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-semibold text-green-800">Proven Results</span>
+        </motion.div>
+        <motion.h2 
+          variants={statVariants}
+          className="text-4xl md:text-5xl font-bold text-gray-800 mb-4"
+        >
+          Trusted by Thousands of Farmers
+        </motion.h2>
+        <motion.p 
+          variants={statVariants}
+          className="text-xl text-gray-600 max-w-3xl mx-auto"
+        >
+          See the impact our platform has made on orchards worldwide
+        </motion.p>
+      </div>
 
       <motion.div 
         variants={containerVariants}
-        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-8"
       >
         {stats.map((stat, index) => (
-          <motion.div key={stat.label} variants={itemVariants}>
-            <Card className={`text-center p-6 bg-white/95 backdrop-blur-md ${stat.accent} border-2 hover:shadow-2xl hover:scale-105 transition-all duration-500 group h-full`}>
-              <CardContent className="p-0 flex flex-col items-center justify-between h-full">
-                <div className="w-full">
-                  <motion.div 
-                    className={`p-4 bg-gradient-to-br ${stat.bg} rounded-full mb-4 group-hover:scale-110 transition-transform duration-300 mx-auto w-fit relative overflow-hidden`}
-                    whileHover={{ rotate: 10 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <motion.div
-                      className="absolute inset-0 bg-white/20 rounded-full"
-                      initial={{ scale: 0, opacity: 0 }}
-                      whileHover={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                    <stat.icon className={`h-8 w-8 ${stat.color} relative z-10`} />
-                  </motion.div>
-                  
-                  <CounterAnimation value={stat.value} />
-                  
-                  <div className="text-sm font-semibold text-gray-700 mt-2 mb-1">
-                    {stat.label}
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 leading-relaxed">
-                    {stat.description}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <motion.div
+            key={stat.label}
+            variants={statVariants}
+            whileHover={{ 
+              y: -10, 
+              scale: 1.05,
+              transition: { type: "spring", stiffness: 300 }
+            }}
+            className="text-center group"
+          >
+            <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+              <motion.div
+                whileHover={{ rotate: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <stat.icon className={`h-8 w-8 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`} />
+              </motion.div>
+            </div>
+            
+            <motion.div
+              initial={{ scale: 0 }}
+              whileInView={{ scale: 1 }}
+              transition={{ delay: 0.3 + index * 0.1, duration: 0.5, type: "spring" }}
+              className="mb-2"
+            >
+              <span className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                {stat.number}
+              </span>
+            </motion.div>
+            
+            <h3 className="text-lg font-semibold text-gray-800 mb-1 group-hover:text-gray-900 transition-colors">
+              {stat.label}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {stat.description}
+            </p>
           </motion.div>
         ))}
       </motion.div>
 
-      <motion.div 
-        variants={itemVariants}
-        className="text-center mt-12"
+      <motion.div
+        variants={statVariants}
+        className="mt-16 text-center"
       >
-        <div className="inline-flex items-center gap-4 bg-gradient-to-r from-green-50 to-blue-50 px-6 py-3 rounded-full border border-green-200/50">
-          <div className="flex -space-x-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div 
-                key={i}
-                className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-400 border-2 border-white flex items-center justify-center text-white text-xs font-bold"
-              >
-                {String.fromCharCode(64 + i)}
-              </div>
-            ))}
+        <div className="inline-flex items-center gap-8 bg-white/80 backdrop-blur-md px-8 py-4 rounded-2xl shadow-lg border border-gray-100">
+          <div className="flex items-center gap-2">
+            <Shield className="h-5 w-5 text-green-600" />
+            <span className="text-sm font-medium text-gray-700">Enterprise Security</span>
           </div>
-          <span className="text-sm text-gray-600 font-medium">
-            Loved by farmers from beginner to enterprise level
-          </span>
+          <div className="flex items-center gap-2">
+            <LeafyGreen className="h-5 w-5 text-green-600" />
+            <span className="text-sm font-medium text-gray-700">Eco-Friendly Solutions</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-green-600" />
+            <span className="text-sm font-medium text-gray-700">Real-time Updates</span>
+          </div>
         </div>
       </motion.div>
     </motion.section>

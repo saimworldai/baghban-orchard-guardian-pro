@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Star, Quote, TreeDeciduous, Users, Award } from 'lucide-react';
+import { Star, Quote, TreeDeciduous, Users, Award, MapPin } from 'lucide-react';
 
 const testimonials = [
   {
@@ -12,7 +12,8 @@ const testimonials = [
     rating: 5,
     avatar: "👨‍🌾",
     icon: TreeDeciduous,
-    color: "from-green-500 to-emerald-500"
+    color: "from-green-500 to-emerald-500",
+    location: "Kashmir, India"
   },
   {
     name: "Maria Santos",
@@ -21,7 +22,8 @@ const testimonials = [
     rating: 5,
     avatar: "👩‍🌾",
     icon: Users,
-    color: "from-blue-500 to-cyan-500"
+    color: "from-blue-500 to-cyan-500",
+    location: "São Paulo, Brazil"
   },
   {
     name: "David Chen",
@@ -30,7 +32,8 @@ const testimonials = [
     rating: 5,
     avatar: "👨‍💼",
     icon: Award,
-    color: "from-purple-500 to-indigo-500"
+    color: "from-purple-500 to-indigo-500",
+    location: "California, USA"
   }
 ];
 
@@ -76,6 +79,10 @@ export function TestimonialsSection() {
                     <div>
                       <h4 className="font-semibold text-gray-800">{testimonial.name}</h4>
                       <p className="text-sm text-gray-600">{testimonial.role}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <MapPin className="h-3 w-3 text-gray-400" />
+                        <span className="text-xs text-gray-500">{testimonial.location}</span>
+                      </div>
                     </div>
                   </div>
                   
@@ -104,11 +111,44 @@ export function TestimonialsSection() {
                   <Quote className="absolute -top-2 -left-1 h-6 w-6 text-gray-300" />
                   <p className="text-gray-700 italic pl-6 leading-relaxed">"{testimonial.content}"</p>
                 </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Verified Customer</span>
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span>Active User</span>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.0, duration: 0.6 }}
+        className="mt-12 text-center"
+      >
+        <div className="inline-flex items-center gap-6 bg-white/80 backdrop-blur-md px-6 py-3 rounded-xl shadow-md border border-gray-100">
+          <div className="flex items-center gap-2">
+            <div className="flex">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <span className="text-sm font-semibold text-gray-700">4.9/5</span>
+          </div>
+          <div className="w-px h-6 bg-gray-300"></div>
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-gray-600" />
+            <span className="text-sm text-gray-600">15,000+ Reviews</span>
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }

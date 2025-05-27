@@ -3,8 +3,15 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Rocket, Shield, Zap, Users, Star } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export function CTASection() {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 50 }}
@@ -95,6 +102,7 @@ export function CTASection() {
           <Button
             size="lg"
             className="bg-white text-green-700 hover:bg-gray-100 px-12 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group border-0"
+            onClick={handleGetStarted}
           >
             <Rocket className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
             Start Free Trial
