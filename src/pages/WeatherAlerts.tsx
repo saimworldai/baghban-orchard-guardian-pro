@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import HourlyForecast from '@/components/weather/HourlyForecast';
 import LocationSearch from '@/components/weather/LocationSearch';
 import { motion } from 'framer-motion';
+import { useLocationState } from '@/hooks/use-location';
 import { 
   getWeatherByCoords, 
   getWeatherByCity, 
@@ -34,9 +35,14 @@ const bgImages = {
 };
 
 const WeatherAlerts: React.FC = () => {
-  const [location, setLocation] = useState('');
+  const { 
+    location, 
+    isGettingLocation, 
+    setLocation, 
+    getCurrentLocation 
+  } = useLocationState();
+  
   const [loading, setLoading] = useState(false);
-  const [locating, setLocating] = useState(false);
   const [currentWeather, setCurrentWeather] = useState<WeatherData | null>(null);
   const [forecast, setForecast] = useState<ForecastData | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string>('');
@@ -63,7 +69,7 @@ const WeatherAlerts: React.FC = () => {
       if (location && retryCount > 0) {
         toast({
           title: "Connection Restored",
-          description: "Attempting to fetch latest weather data...",
+          description: "Fetching latest real-time weather data...",
         });
         fetchWeatherData();
       }
@@ -87,11 +93,11 @@ const WeatherAlerts: React.FC = () => {
     };
   }, [location, retryCount]);
 
-  // Optimized weather fetching with retry logic
+  // Enhanced weather fetching with real-time geolocation integration
   const fetchWeatherData = useCallback(async (lat?: number, lon?: number, retries = 3) => {
     if (!isOnline && retries > 0) {
       toast({
-        title: "Offline",
+        title: "Offline Mode",
         description: "Using cached weather data",
         variant: "destructive",
       });
@@ -104,18 +110,21 @@ const WeatherAlerts: React.FC = () => {
       let weatherData;
       let forecastData;
       
-      if (lat !== undefined && lon !== undefined) {
+      // Use provided coordinates or current location
+      const coords = lat !== undefined && lon !== undefined 
+        ? { lat, lon } 
+        : location 
+        ? { lat: location.lat, lon: location.lon }
+        : null;
+      
+      if (coords) {
+        console.log(`Fetching real-time weather for coordinates: ${coords.lat}, ${coords.lon}`);
         [weatherData, forecastData] = await Promise.all([
-          getWeatherByCoords(lat, lon),
-          getForecastByCoords(lat, lon)
-        ]);
-      } else if (location) {
-        [weatherData, forecastData] = await Promise.all([
-          getWeatherByCity(location),
-          getForecastByCity(location)
+          getWeatherByCoords(coords.lat, coords.lon),
+          getForecastByCoords(coords.lat, coords.lon)
         ]);
       } else {
-        throw new Error("No location specified");
+        throw new Error("No location available");
       }
       
       if (weatherData && forecastData) {
@@ -124,8 +133,13 @@ const WeatherAlerts: React.FC = () => {
         setLastUpdated(new Date().toLocaleTimeString());
         setRetryCount(0);
         
+        // Update location name if we got coordinates
         if (lat !== undefined && lon !== undefined && weatherData.city_name) {
-          setLocation(weatherData.city_name);
+          setLocation({
+            lat,
+            lon,
+            name: weatherData.city_name
+          });
         }
         
         // Set background based on current weather
@@ -134,75 +148,64 @@ const WeatherAlerts: React.FC = () => {
         }
         
         toast({
-          title: "Weather Updated",
-          description: `Latest data for ${weatherData.city_name} loaded successfully.`,
+          title: "Real-time Weather Updated",
+          description: `Live data for ${weatherData.city_name} loaded successfully`,
         });
       }
     } catch (error) {
-      console.error("Error fetching weather data:", error);
+      console.error("Error fetching real-time weather data:", error);
       setRetryCount(prev => prev + 1);
       
       if (retries > 0 && isOnline) {
-        console.log(`Retrying... ${retries} attempts left`);
+        console.log(`Retrying real-time fetch... ${retries} attempts left`);
         setTimeout(() => fetchWeatherData(lat, lon, retries - 1), 2000);
         return;
       }
       
       toast({
-        title: "Weather Service Issue",
-        description: "Using sample data for demonstration. Service will retry automatically.",
+        title: "Real-time Weather Unavailable",
+        description: "Using demonstration data. Service will retry automatically.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
     }
-  }, [location, isOnline]);
+  }, [location, isOnline, setLocation]);
 
   const handleLocationSelect = async ({ lat, lon, name }: { lat: number; lon: number; name: string }) => {
-    setLocation(name);
+    setLocation({ lat, lon, name });
     await fetchWeatherData(lat, lon);
   };
 
-  const getCurrentLocation = () => {
-    setLocating(true);
-    
-    if (!navigator.geolocation) {
+  const handleGetCurrentLocation = async () => {
+    try {
+      const locationData = await getCurrentLocation();
+      if (locationData) {
+        toast({
+          title: "Location Found",
+          description: `Getting real-time weather for your current location`,
+        });
+        await fetchWeatherData(locationData.lat, locationData.lon);
+      }
+    } catch (error) {
+      console.error("Error getting current location:", error);
       toast({
-        title: "Error",
-        description: "Geolocation is not supported by your browser",
+        title: "Location Error", 
+        description: "Unable to get your current location. Please select manually or check permissions.",
         variant: "destructive",
       });
-      setLocating(false);
-      return;
     }
-    
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        await fetchWeatherData(latitude, longitude);
-        setLocating(false);
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        toast({
-          title: "Location Error", 
-          description: "Unable to get your location. Please select manually.",
-          variant: "destructive",
-        });
-        setLocating(false);
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
   };
 
   const handleRefresh = () => {
     if (location) {
-      fetchWeatherData();
+      fetchWeatherData(location.lat, location.lon);
     } else {
-      getCurrentLocation();
+      handleGetCurrentLocation();
     }
   };
 
+  // Function to toggle auto-refresh
   const toggleAutoRefresh = () => {
     if (!autoRefresh) {
       // Start auto-refresh every 10 minutes
@@ -211,7 +214,7 @@ const WeatherAlerts: React.FC = () => {
           handleRefresh();
           toast({
             title: "Auto Refresh",
-            description: "Weather data updated automatically",
+            description: "Real-time weather data updated automatically",
           });
         }
       }, 10 * 60 * 1000);
@@ -221,7 +224,7 @@ const WeatherAlerts: React.FC = () => {
       
       toast({
         title: "Auto Refresh Enabled",
-        description: "Weather data will update every 10 minutes",
+        description: "Real-time weather will update every 10 minutes",
       });
     } else {
       // Stop auto-refresh
@@ -249,7 +252,7 @@ const WeatherAlerts: React.FC = () => {
 
   // Get initial location when component mounts
   useEffect(() => {
-    getCurrentLocation();
+    handleGetCurrentLocation();
   }, []);
 
   const getIconComponent = (code: number) => {
@@ -348,8 +351,15 @@ const WeatherAlerts: React.FC = () => {
             Real-Time Weather Intelligence
           </h1>
           <p className="text-white/90 drop-shadow">
-            Advanced weather monitoring with AI-powered spray recommendations for optimal orchard management
+            Live geolocation-based weather monitoring with AI-powered spray recommendations
           </p>
+          
+          {location && (
+            <div className="mt-4 bg-green-500/20 border border-green-400/30 text-green-100 px-4 py-2 rounded-lg backdrop-blur-sm flex items-center justify-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Current Location: {location.name}
+            </div>
+          )}
           
           {!isOnline && (
             <div className="mt-4 bg-amber-500/20 border border-amber-400/30 text-amber-100 px-4 py-2 rounded-lg backdrop-blur-sm">
@@ -368,15 +378,15 @@ const WeatherAlerts: React.FC = () => {
                 <Button 
                   variant="outline" 
                   className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
-                  onClick={getCurrentLocation}
-                  disabled={locating || loading}
+                  onClick={handleGetCurrentLocation}
+                  disabled={isGettingLocation || loading}
                 >
-                  {locating ? (
+                  {isGettingLocation ? (
                     <Loader className="h-4 w-4 animate-spin" />
                   ) : (
                     <Locate className="h-4 w-4" />
                   )}
-                  {locating ? "Locating..." : "Current Location"}
+                  {isGettingLocation ? "Getting Location..." : "Current Location"}
                 </Button>
                 
                 <Button 
@@ -414,7 +424,7 @@ const WeatherAlerts: React.FC = () => {
               {loading && !currentWeather ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Loader className="h-12 w-12 text-blue-500 animate-spin mb-4" />
-                  <p className="text-blue-700">Loading weather intelligence...</p>
+                  <p className="text-blue-700">Loading real-time weather intelligence...</p>
                 </div>
               ) : currentWeather && currentWeather.data ? (
                 <>
@@ -489,9 +499,9 @@ const WeatherAlerts: React.FC = () => {
               ) : (
                 <div className="text-center py-8">
                   <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Weather Service Starting</h3>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Real-time Weather Starting</h3>
                   <p className="text-muted-foreground">
-                    Setting up weather intelligence. Please select a location or allow location access.
+                    Setting up geolocation-based weather intelligence. Please allow location access for real-time data.
                   </p>
                 </div>
               )}
@@ -500,15 +510,15 @@ const WeatherAlerts: React.FC = () => {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="h-5 w-5 text-blue-600 mt-1" />
                   <div>
-                    <AlertTitle className="text-blue-700 font-semibold mb-2">AI-Powered Spray Intelligence</AlertTitle>
+                    <AlertTitle className="text-blue-700 font-semibold mb-2">Real-time AI Weather Intelligence</AlertTitle>
                     <AlertDescription className="text-blue-600">
-                      Our advanced weather analysis considers multiple factors for spray recommendations:
+                      Our advanced real-time system uses your exact geolocation for precise recommendations:
                       <ul className="list-disc list-inside mt-2 space-y-1">
-                        <li>Real-time temperature and humidity monitoring</li>
-                        <li>Wind speed analysis and drift prediction</li>
-                        <li>Precipitation forecasting and timing</li>
-                        <li>Weather pattern recognition and alerts</li>
-                        <li>Optimal application window identification</li>
+                        <li>Live GPS-based weather monitoring</li>
+                        <li>Real-time temperature and humidity tracking</li>
+                        <li>Current wind speed analysis and drift prediction</li>
+                        <li>Live precipitation monitoring and forecasting</li>
+                        <li>Automatic location-based optimal spray windows</li>
                       </ul>
                       Always follow product-specific guidelines and local regulations.
                     </AlertDescription>
