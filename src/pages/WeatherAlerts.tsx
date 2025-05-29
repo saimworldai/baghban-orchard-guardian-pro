@@ -1,38 +1,22 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Cloud, Sun, Wind, CloudRain, Thermometer, CloudLightning, 
-  MapPin, Umbrella, Clock, Droplet, AlertTriangle, 
-  Check, Loader, CloudDrizzle, CloudSnow, CloudSun, RefreshCw, Locate
-} from 'lucide-react';
+import { Umbrella } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import HourlyForecast from '@/components/weather/HourlyForecast';
-import LocationSearch from '@/components/weather/LocationSearch';
-import { motion } from 'framer-motion';
 import { useLocationState } from '@/hooks/use-location';
 import { 
   getWeatherByCoords, 
-  getWeatherByCity, 
   getForecastByCoords,
-  getForecastByCity,
-  getSprayRecommendation,
-  getWeatherIcon,
-  formatDay,
   type WeatherData,
   type ForecastData
 } from '@/services/weatherService';
-
-// High-quality background images for different weather conditions
-const bgImages = {
-  clear: "url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-  clouds: "url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-  rain: "url('https://images.unsplash.com/photo-1438449805896-28a666819a20?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-  snow: "url('https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-  thunderstorm: "url('https://images.unsplash.com/photo-1470813740244-df37b8c1edcb?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-  default: "url('https://images.unsplash.com/photo-1458668383970-8ddd3927deed?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')"
-};
+import { WeatherBackground } from '@/components/weather/WeatherBackground';
+import { WeatherHeader } from '@/components/weather/WeatherHeader';
+import { WeatherControls } from '@/components/weather/WeatherControls';
+import { CurrentWeatherCard } from '@/components/weather/CurrentWeatherCard';
+import { ForecastCard } from '@/components/weather/ForecastCard';
+import { WeatherStatus } from '@/components/weather/WeatherStatus';
 
 const WeatherAlerts: React.FC = () => {
   const { 
@@ -48,19 +32,8 @@ const WeatherAlerts: React.FC = () => {
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [updateInterval, setUpdateInterval] = useState<NodeJS.Timeout | null>(null);
-  const [bgImage, setBgImage] = useState(bgImages.default);
   const [retryCount, setRetryCount] = useState(0);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-
-  // Function to determine background based on weather code
-  const getBackgroundForWeather = (code: number) => {
-    if (code >= 200 && code < 300) return bgImages.thunderstorm;
-    if (code >= 300 && code < 600) return bgImages.rain;
-    if (code >= 600 && code < 700) return bgImages.snow;
-    if (code >= 801) return bgImages.clouds;
-    if (code === 800) return bgImages.clear;
-    return bgImages.default;
-  };
 
   // Monitor online status
   useEffect(() => {
@@ -140,11 +113,6 @@ const WeatherAlerts: React.FC = () => {
             lon,
             name: weatherData.city_name
           });
-        }
-        
-        // Set background based on current weather
-        if (weatherData.data && weatherData.data[0] && weatherData.data[0].weather) {
-          setBgImage(getBackgroundForWeather(weatherData.data[0].weather.code));
         }
         
         toast({
@@ -255,281 +223,55 @@ const WeatherAlerts: React.FC = () => {
     handleGetCurrentLocation();
   }, []);
 
-  const getIconComponent = (code: number) => {
-    const iconName = getWeatherIcon(code);
-    
-    switch (iconName) {
-      case "CloudLightning": return CloudLightning;
-      case "CloudDrizzle": return CloudDrizzle;
-      case "CloudRain": return CloudRain;
-      case "CloudSnow": return CloudSnow;
-      case "Cloud": return Cloud;
-      case "Sun": return Sun;
-      case "CloudSun": return CloudSun;
-      default: return Cloud;
-    }
-  };
-
-  const renderForecastCards = () => {
-    if (!forecast) return null;
-    
-    return forecast.data.map((day, index) => {
-      const IconComponent = getIconComponent(day.weather.code);
-      const sprayRecommendation = getSprayRecommendation(
-        day.weather.code,
-        day.wind_spd,
-        day.precip,
-        day.rh,
-        day.temp
-      );
-      
-      return (
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: index * 0.05 }}
-          className="bg-white/90 rounded-xl shadow-md border border-blue-100 p-5 text-center hover:shadow-lg transition-all duration-300 hover:translate-y-[-2px]"
-        >
-          <h3 className="text-lg font-semibold text-blue-700">{formatDay(day.valid_date)}</h3>
-          <IconComponent size={48} className="mx-auto my-3 text-blue-500" />
-          <p className="text-2xl font-bold">{Math.round(day.temp)}°C</p>
-          <p className="text-sm text-gray-600">{day.weather.description}</p>
-          
-          <div className="flex justify-between text-sm text-muted-foreground mt-2">
-            <span>H: {Math.round(day.max_temp)}°</span>
-            <span>L: {Math.round(day.min_temp)}°</span>
-          </div>
-          
-          <div className="flex items-center justify-center gap-1 mt-2 text-sm text-blue-600">
-            <Wind className="h-3 w-3" />
-            <span>{Math.round(day.wind_spd)} km/h</span>
-          </div>
-          
-          <div className="flex items-center justify-center gap-1 mt-1 text-sm text-blue-600">
-            <Droplet className="h-3 w-3" />
-            <span>{day.rh}%</span>
-          </div>
-          
-          {day.pop > 0 && (
-            <div className="mt-3 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-sm font-medium border border-blue-100">
-              {Math.round(day.pop)}% chance of rain
-            </div>
-          )}
-          
-          <div className={`mt-3 ${sprayRecommendation.recommended ? 'bg-green-50 text-green-600 border-green-100' : 'bg-amber-50 text-amber-600 border-amber-100'} px-3 py-1.5 rounded-lg text-sm font-medium border flex items-center justify-center gap-1.5`}>
-            {sprayRecommendation.recommended ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <AlertTriangle className="h-4 w-4" />
-            )}
-            <span>
-              {sprayRecommendation.recommended ? 'Spray OK' : 'Not Recommended'}
-            </span>
-          </div>
-          
-          <p className="mt-2 text-xs text-muted-foreground">
-            {sprayRecommendation.reason}
-          </p>
-        </motion.div>
-      );
-    });
-  };
+  const weatherCode = currentWeather?.data?.[0]?.weather?.code;
 
   return (
-    <div className="min-h-screen py-8 bg-cover bg-center bg-fixed transition-all duration-1000 ease-in-out" style={{ backgroundImage: bgImage }}>
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-black/40 backdrop-blur-[2px] z-0"></div>
+    <WeatherBackground weatherCode={weatherCode}>
+      <WeatherHeader location={location} isOnline={isOnline} />
       
-      <div className="container mx-auto px-4 space-y-8 relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center max-w-3xl mx-auto mb-6"
-        >
-          <h1 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-            Real-Time Weather Intelligence
-          </h1>
-          <p className="text-white/90 drop-shadow">
-            Live geolocation-based weather monitoring with AI-powered spray recommendations
-          </p>
-          
-          {location && (
-            <div className="mt-4 bg-green-500/20 border border-green-400/30 text-green-100 px-4 py-2 rounded-lg backdrop-blur-sm flex items-center justify-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Current Location: {location.name}
-            </div>
-          )}
-          
-          {!isOnline && (
-            <div className="mt-4 bg-amber-500/20 border border-amber-400/30 text-amber-100 px-4 py-2 rounded-lg backdrop-blur-sm">
-              <AlertTriangle className="inline h-4 w-4 mr-2" />
-              Offline Mode - Data may not be current
-            </div>
-          )}
-        </motion.div>
-        
-        <Card className="overflow-hidden border border-white/20 shadow-xl backdrop-blur-md bg-white/80">
-          <CardContent className="p-6">
-            <div className="space-y-6">
-              <LocationSearch onLocationSelect={handleLocationSelect} />
-              
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
-                  onClick={handleGetCurrentLocation}
-                  disabled={isGettingLocation || loading}
-                >
-                  {isGettingLocation ? (
-                    <Loader className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Locate className="h-4 w-4" />
-                  )}
-                  {isGettingLocation ? "Getting Location..." : "Current Location"}
-                </Button>
-                
-                <Button 
-                  variant={autoRefresh ? "default" : "outline"}
-                  className={`flex items-center gap-2 ${autoRefresh ? 'bg-blue-600 hover:bg-blue-700' : 'border-blue-200 text-blue-700 hover:bg-blue-50'}`}
-                  onClick={toggleAutoRefresh}
-                >
-                  <Clock className="h-4 w-4" />
-                  Auto-Refresh {autoRefresh ? "On" : "Off"}
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-blue-700"
-                  onClick={handleRefresh}
-                  disabled={loading}
-                >
-                  <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-                </Button>
-                
-                {lastUpdated && (
-                  <span className="text-xs text-muted-foreground">
-                    Updated: {lastUpdated}
-                  </span>
-                )}
-                
-                {retryCount > 0 && (
-                  <span className="text-xs text-amber-600">
-                    Retry #{retryCount}
-                  </span>
-                )}
-              </div>
+      <Card className="overflow-hidden border border-white/20 shadow-xl backdrop-blur-md bg-white/80">
+        <CardContent className="p-6">
+          <div className="space-y-6">
+            <WeatherControls
+              onLocationSelect={handleLocationSelect}
+              onGetCurrentLocation={handleGetCurrentLocation}
+              onRefresh={handleRefresh}
+              onToggleAutoRefresh={toggleAutoRefresh}
+              isGettingLocation={isGettingLocation}
+              loading={loading}
+              autoRefresh={autoRefresh}
+              lastUpdated={lastUpdated}
+              retryCount={retryCount}
+            />
 
-              {loading && !currentWeather ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Loader className="h-12 w-12 text-blue-500 animate-spin mb-4" />
-                  <p className="text-blue-700">Loading real-time weather intelligence...</p>
-                </div>
-              ) : currentWeather && currentWeather.data ? (
-                <>
-                  {/* ... keep existing code (current weather display) */}
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                    className="flex flex-col sm:flex-row items-center justify-between p-6 mb-8 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl border border-blue-100 backdrop-blur-sm"
-                  >
-                    {React.createElement(
-                      getIconComponent(currentWeather.data[0].weather.code),
-                      { size: 74, className: "text-blue-500 drop-shadow-md" }
-                    )}
-                    <div className="text-center sm:text-left mt-4 sm:mt-0">
-                      <h2 className="text-2xl font-bold text-blue-800">{currentWeather.city_name}</h2>
-                      <p className="text-muted-foreground">{currentWeather.country_code}</p>
-                      <p className="text-5xl font-bold text-blue-700 mt-2 drop-shadow">
-                        {Math.round(currentWeather.data[0].temp)}°C
-                      </p>
-                      <p className="text-md text-gray-600 mt-1 italic">
-                        {currentWeather.data[0].weather.description}
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-6 mt-6 sm:mt-0">
-                      <div className="flex flex-col items-center bg-white/60 p-3 rounded-lg">
-                        <div className="flex items-center text-blue-700">
-                          <Thermometer className="h-4 w-4 mr-1" />
-                          <span className="text-sm font-medium">Feels like</span>
-                        </div>
-                        <span className="text-xl font-semibold">{Math.round(currentWeather.data[0].app_temp)}°C</span>
-                      </div>
-                      <div className="flex flex-col items-center bg-white/60 p-3 rounded-lg">
-                        <div className="flex items-center text-blue-700">
-                          <Wind className="h-4 w-4 mr-1" />
-                          <span className="text-sm font-medium">Wind</span>
-                        </div>
-                        <span className="text-xl font-semibold">{Math.round(currentWeather.data[0].wind_spd)} km/h</span>
-                      </div>
-                      <div className="flex flex-col items-center bg-white/60 p-3 rounded-lg">
-                        <div className="flex items-center text-blue-700">
-                          <Droplet className="h-4 w-4 mr-1" />
-                          <span className="text-sm font-medium">Humidity</span>
-                        </div>
-                        <span className="text-xl font-semibold">{currentWeather.data[0].rh}%</span>
-                      </div>
-                      <div className="flex flex-col items-center bg-white/60 p-3 rounded-lg">
-                        <div className="flex items-center text-blue-700">
-                          <CloudRain className="h-4 w-4 mr-1" />
-                          <span className="text-sm font-medium">Precip</span>
-                        </div>
-                        <span className="text-xl font-semibold">{currentWeather.data[0].precip} mm</span>
-                      </div>
-                    </div>
-                  </motion.div>
+            <WeatherStatus loading={loading} currentWeather={currentWeather} />
 
-                  {forecast && forecast.data[0].hour && (
-                    <div className="mb-8">
-                      <HourlyForecast hours={forecast.data[0].hour} />
-                    </div>
-                  )}
+            {currentWeather && currentWeather.data && (
+              <>
+                <CurrentWeatherCard currentWeather={currentWeather} />
 
-                  <h2 className="text-xl font-semibold mb-6 text-blue-800 flex items-center">
-                    <Umbrella className="mr-2 h-5 w-5" />
-                    15-Day Forecast & AI Spray Recommendations
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                    {renderForecastCards()}
+                {forecast && forecast.data[0].hour && (
+                  <div className="mb-8">
+                    <HourlyForecast hours={forecast.data[0].hour} />
                   </div>
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <AlertTriangle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">Real-time Weather Starting</h3>
-                  <p className="text-muted-foreground">
-                    Setting up geolocation-based weather intelligence. Please allow location access for real-time data.
-                  </p>
+                )}
+
+                <h2 className="text-xl font-semibold mb-6 text-blue-800 flex items-center">
+                  <Umbrella className="mr-2 h-5 w-5" />
+                  15-Day Forecast & AI Spray Recommendations
+                </h2>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                  {forecast?.data.map((day, index) => (
+                    <ForecastCard key={index} day={day} index={index} />
+                  ))}
                 </div>
-              )}
-              
-              <Alert className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
-                <div className="flex items-start gap-3">
-                  <AlertTriangle className="h-5 w-5 text-blue-600 mt-1" />
-                  <div>
-                    <AlertTitle className="text-blue-700 font-semibold mb-2">Real-time AI Weather Intelligence</AlertTitle>
-                    <AlertDescription className="text-blue-600">
-                      Our advanced real-time system uses your exact geolocation for precise recommendations:
-                      <ul className="list-disc list-inside mt-2 space-y-1">
-                        <li>Live GPS-based weather monitoring</li>
-                        <li>Real-time temperature and humidity tracking</li>
-                        <li>Current wind speed analysis and drift prediction</li>
-                        <li>Live precipitation monitoring and forecasting</li>
-                        <li>Automatic location-based optimal spray windows</li>
-                      </ul>
-                      Always follow product-specific guidelines and local regulations.
-                    </AlertDescription>
-                  </div>
-                </div>
-              </Alert>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </WeatherBackground>
   );
 };
 
