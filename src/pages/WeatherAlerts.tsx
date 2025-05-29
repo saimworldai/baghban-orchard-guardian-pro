@@ -20,6 +20,8 @@ import { WeatherSummary } from '@/components/weather/WeatherSummary';
 import { DetailedWeatherGrid } from '@/components/weather/DetailedWeatherGrid';
 import { WeatherInsights } from '@/components/weather/WeatherInsights';
 import { QuickActions } from '@/components/weather/QuickActions';
+import { AISprayRecommendations } from '@/components/weather/AISprayRecommendations';
+import { LiveLocationTracker } from '@/components/weather/LiveLocationTracker';
 
 const WeatherAlerts: React.FC = () => {
   const { 
@@ -235,6 +237,12 @@ const WeatherAlerts: React.FC = () => {
       <Card className="overflow-hidden border border-white/20 shadow-xl backdrop-blur-md bg-white/80">
         <CardContent className="p-6">
           <div className="space-y-6">
+            {/* Enhanced Live Location Tracker */}
+            <LiveLocationTracker 
+              onLocationUpdate={fetchWeatherData}
+              autoTrack={false}
+            />
+
             <WeatherControls
               onLocationSelect={handleLocationSelect}
               onGetCurrentLocation={handleGetCurrentLocation}
@@ -259,6 +267,12 @@ const WeatherAlerts: React.FC = () => {
                 />
 
                 <CurrentWeatherCard currentWeather={currentWeather} />
+
+                {/* Enhanced AI Spray Recommendations */}
+                <AISprayRecommendations 
+                  currentWeather={currentWeather}
+                  location={location}
+                />
 
                 <DetailedWeatherGrid currentWeather={currentWeather} />
 
