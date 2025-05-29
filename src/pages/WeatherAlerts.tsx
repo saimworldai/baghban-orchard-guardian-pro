@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Umbrella } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,6 +16,10 @@ import { WeatherControls } from '@/components/weather/WeatherControls';
 import { CurrentWeatherCard } from '@/components/weather/CurrentWeatherCard';
 import { ForecastCard } from '@/components/weather/ForecastCard';
 import { WeatherStatus } from '@/components/weather/WeatherStatus';
+import { WeatherSummary } from '@/components/weather/WeatherSummary';
+import { DetailedWeatherGrid } from '@/components/weather/DetailedWeatherGrid';
+import { WeatherInsights } from '@/components/weather/WeatherInsights';
+import { QuickActions } from '@/components/weather/QuickActions';
 
 const WeatherAlerts: React.FC = () => {
   const { 
@@ -248,7 +251,20 @@ const WeatherAlerts: React.FC = () => {
 
             {currentWeather && currentWeather.data && (
               <>
+                <WeatherSummary 
+                  currentWeather={currentWeather}
+                  lastUpdated={lastUpdated}
+                  isOnline={isOnline}
+                  location={location}
+                />
+
                 <CurrentWeatherCard currentWeather={currentWeather} />
+
+                <DetailedWeatherGrid currentWeather={currentWeather} />
+
+                <WeatherInsights currentWeather={currentWeather} />
+
+                <QuickActions weatherData={currentWeather} location={location} />
 
                 {forecast && forecast.data[0].hour && (
                   <div className="mb-8">
