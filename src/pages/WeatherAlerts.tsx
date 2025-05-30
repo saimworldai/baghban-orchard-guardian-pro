@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Umbrella } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -22,8 +23,11 @@ import { WeatherInsights } from '@/components/weather/WeatherInsights';
 import { QuickActions } from '@/components/weather/QuickActions';
 import { AISprayRecommendations } from '@/components/weather/AISprayRecommendations';
 import { LiveLocationTracker } from '@/components/weather/LiveLocationTracker';
+import { WeatherPerformanceMonitor } from '@/components/weather/WeatherPerformanceMonitor';
+import { WeatherAlerts } from '@/components/weather/WeatherAlerts';
+import { WeatherComparison } from '@/components/weather/WeatherComparison';
 
-const WeatherAlerts: React.FC = () => {
+const WeatherAlertsPage: React.FC = () => {
   const { 
     location, 
     isGettingLocation, 
@@ -214,6 +218,11 @@ const WeatherAlerts: React.FC = () => {
     }
   };
 
+  // Handle live location update with proper function signature
+  const handleLiveLocationUpdate = async (locationData: { lat: number; lon: number; name: string }) => {
+    await fetchWeatherData(locationData.lat, locationData.lon);
+  };
+
   // Clean up interval on component unmount
   useEffect(() => {
     return () => {
@@ -237,9 +246,12 @@ const WeatherAlerts: React.FC = () => {
       <Card className="overflow-hidden border border-white/20 shadow-xl backdrop-blur-md bg-white/80">
         <CardContent className="p-6">
           <div className="space-y-6">
+            {/* Performance Monitor */}
+            <WeatherPerformanceMonitor />
+
             {/* Enhanced Live Location Tracker */}
             <LiveLocationTracker 
-              onLocationUpdate={fetchWeatherData}
+              onLocationUpdate={handleLiveLocationUpdate}
               autoTrack={false}
             />
 
@@ -257,6 +269,12 @@ const WeatherAlerts: React.FC = () => {
 
             <WeatherStatus loading={loading} currentWeather={currentWeather} />
 
+            {/* Weather Alerts */}
+            <WeatherAlerts 
+              currentWeather={currentWeather}
+              location={location}
+            />
+
             {currentWeather && currentWeather.data && (
               <>
                 <WeatherSummary 
@@ -267,6 +285,12 @@ const WeatherAlerts: React.FC = () => {
                 />
 
                 <CurrentWeatherCard currentWeather={currentWeather} />
+
+                {/* Weather Comparison */}
+                <WeatherComparison 
+                  currentWeather={currentWeather}
+                  location={location}
+                />
 
                 {/* Enhanced AI Spray Recommendations */}
                 <AISprayRecommendations 
@@ -305,4 +329,4 @@ const WeatherAlerts: React.FC = () => {
   );
 };
 
-export default WeatherAlerts;
+export default WeatherAlertsPage;
