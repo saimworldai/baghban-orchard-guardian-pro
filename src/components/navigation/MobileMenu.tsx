@@ -39,12 +39,12 @@ export function MobileMenu() {
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-4 py-4">
-          <NavLinks isMobile={true} role={role} onItemClick={handleClose} />
-          {user ? (
-            <UserMenu isMobile={true} onItemClick={handleClose} />
-          ) : (
-            <UserMenu isMobile={true} onItemClick={handleClose} />
-          )}
+          <div onClick={handleClose}>
+            <NavLinks mobile={true} role={role} />
+          </div>
+          <div onClick={handleClose}>
+            <UserMenu mobile={true} />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
