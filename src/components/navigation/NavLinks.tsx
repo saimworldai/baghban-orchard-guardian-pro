@@ -9,7 +9,8 @@ import {
   Users, 
   Shield,
   BarChart3,
-  Zap
+  Zap,
+  Settings
 } from "lucide-react";
 
 type NavLinksProps = {
@@ -85,13 +86,23 @@ export function NavLinks({ role, mobile = false }: NavLinksProps) {
       </NavLink>
       
       {role === 'admin' && (
-        <NavLink 
-          to="/admin-consultation" 
-          className={({ isActive }) => isActive ? activeLinkClass : linkClass}
-        >
-          <Shield className="h-4 w-4" />
-          Admin
-        </NavLink>
+        <>
+          <NavLink 
+            to="/admin-consultation" 
+            className={({ isActive }) => isActive ? activeLinkClass : linkClass}
+          >
+            <Shield className="h-4 w-4" />
+            Admin Consultation
+          </NavLink>
+          
+          <NavLink 
+            to="/admin-dashboard" 
+            className={({ isActive }) => isActive ? activeLinkClass : linkClass}
+          >
+            <Settings className="h-4 w-4" />
+            Admin Dashboard
+          </NavLink>
+        </>
       )}
     </div>
   );

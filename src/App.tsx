@@ -19,6 +19,7 @@ import SpraySchedule from "./pages/SpraySchedule";
 import ExpertConsultation from "./pages/ExpertConsultation";
 import ExpertCall from "./pages/ExpertCall";
 import AdminConsultation from "./pages/AdminConsultation";
+import AdminDashboard from "./pages/AdminDashboard";
 import CallMonitor from "./pages/CallMonitor";
 import Analytics from "./pages/Analytics";
 import Integrations from "./pages/Integrations";
@@ -47,6 +48,7 @@ function App() {
               <Route path="/expert-consultation" element={<ExpertConsultation />} />
               <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
               <Route path="/admin-consultation" element={<AdminConsultation />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
               <Route path="/expert-consultation/monitor/:consultationId" element={<CallMonitor />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/integrations" element={<Integrations />} />
