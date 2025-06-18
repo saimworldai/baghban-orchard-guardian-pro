@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { HeroSection } from '@/components/home/HeroSection';
+import { EnhancedHeroSection } from '@/components/home/EnhancedHeroSection';
 import { StatsSection } from '@/components/home/StatsSection';
 import { FeaturesGrid } from '@/components/home/FeaturesGrid';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
@@ -26,7 +25,7 @@ const Index = () => {
       <BackgroundElements />
       
       <div className="container mx-auto px-4 py-16">
-        <HeroSection />
+        <EnhancedHeroSection />
         <StatsSection />
         <FeaturesGrid />
         <TestimonialsSection />
