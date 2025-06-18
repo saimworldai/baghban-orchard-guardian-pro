@@ -84,26 +84,20 @@ export function WeatherComparison({ currentWeather, location }: WeatherCompariso
           </div>
         </div>
         
-        {(weather.uv || weather.vis || weather.pres) && (
+        {weather.pres && (
           <div className="mt-4 pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
-            {weather.uv && (
-              <div>
-                <p className="text-sm text-gray-600">UV Index</p>
-                <p className="font-semibold">{weather.uv}</p>
-              </div>
-            )}
-            {weather.vis && (
-              <div>
-                <p className="text-sm text-gray-600">Visibility</p>
-                <p className="font-semibold">{weather.vis} km</p>
-              </div>
-            )}
-            {weather.pres && (
-              <div>
-                <p className="text-sm text-gray-600">Pressure</p>
-                <p className="font-semibold">{weather.pres} hPa</p>
-              </div>
-            )}
+            <div>
+              <p className="text-sm text-gray-600">Pressure</p>
+              <p className="font-semibold">{weather.pres} hPa</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Clouds</p>
+              <p className="font-semibold">{weather.clouds}%</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Precipitation</p>
+              <p className="font-semibold">{weather.precip} mm</p>
+            </div>
           </div>
         )}
       </CardContent>

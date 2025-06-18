@@ -19,41 +19,21 @@ export function useUserRole() {
       }
 
       try {
-        // First try to check if a user_roles table exists
-        // This is more robust than relying on the email pattern
-        try {
-          const { data: roleData, error: roleError } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', user.id)
-            .single();
-            
-          if (roleData?.role) {
-            setRole(roleData.role as UserRole);
-            setLoading(false);
-            return;
-          }
-        } catch (roleCheckError) {
-          // If the user_roles table doesn't exist, continue to email-based detection
-          console.log('User roles table may not exist yet, falling back to email pattern');
-        }
-        
-        // Get user profile
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
+        // Use the new user_roles table to get the user's role
+        const { data: roleData, error: roleError } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
           .single();
-
-        if (error) throw error;
-        
-        // Temporary solution - email-based role detection
-        // This should be replaced with a proper role-based system
-        if (user.email?.includes('admin')) {
-          setRole('admin');
-        } else if (user.email?.includes('consultant')) {
-          setRole('consultant');
+          
+        if (roleError) {
+          console.error('Error fetching user role:', roleError);
+          // If no role found, default to farmer (new users get farmer role via trigger)
+          setRole('farmer');
+        } else if (roleData?.role) {
+          setRole(roleData.role as UserRole);
         } else {
+          // Fallback to farmer role
           setRole('farmer');
         }
       } catch (error) {

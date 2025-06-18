@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +17,7 @@ import {
   TrendingUp,
   Eye
 } from "lucide-react";
+import { UserRoleManager } from "./UserRoleManager";
 
 export function AdminOverview() {
   const [activeTab, setActiveTab] = useState("overview");
@@ -207,22 +207,7 @@ export function AdminOverview() {
         </TabsContent>
 
         <TabsContent value="users" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">User Management</h3>
-                <p className="text-gray-600 mb-4">Manage user accounts, roles, and permissions</p>
-                <Button>
-                  <Users className="h-4 w-4 mr-2" />
-                  View All Users
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <UserRoleManager />
         </TabsContent>
 
         <TabsContent value="consultations" className="space-y-4">
