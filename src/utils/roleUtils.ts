@@ -1,69 +1,77 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { UserRole } from '@/hooks/useUserRole';
+import { Database } from '@/integrations/supabase/types';
 
-export interface UserWithRole {
+export type UserRole = 'farmer' | 'consultant' | 'admin';
+
+// Define the user data type based on what we expect from the query
+type UserData = {
   id: string;
-  email: string;
-  full_name: string;
+  full_name: string | null;
   role: UserRole;
-  created_at: string;
-  last_sign_in_at: string | null;
-}
+};
 
-export async function getAllUsersWithRoles(): Promise<UserWithRole[]> {
+export const getRoleDisplayName = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+      return 'Administrator';
+    case 'consultant':
+      return 'Agricultural Consultant';
+    case 'farmer':
+      return 'Farmer';
+    default:
+      return 'User';
+  }
+};
+
+export const getRoleColor = (role: UserRole): string => {
+  switch (role) {
+    case 'admin':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'consultant':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'farmer':
+      return 'bg-green-100 text-green-800 border-green-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+  }
+};
+
+export const getAllUsersWithRoles = async (): Promise<UserData[]> => {
   try {
-    // Get all user roles with user data
-    const { data: userRoles, error: rolesError } = await supabase
+    const { data, error } = await supabase
       .from('user_roles')
       .select(`
         user_id,
         role,
         profiles!inner(
+          id,
           full_name
         )
       `);
 
-    if (rolesError) {
-      console.error('Error fetching user roles:', rolesError);
+    if (error) {
+      console.error('Error fetching users with roles:', error);
       return [];
     }
 
-    // Get auth users data
-    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
-    
-    if (authError) {
-      console.error('Error fetching auth users:', authError);
-      return [];
-    }
-
-    // Combine the data
-    const usersWithRoles: UserWithRole[] = userRoles.map(userRole => {
-      const authUser = authUsers.users.find(user => user.id === userRole.user_id);
-      const profile = userRole.profiles;
-      
-      return {
-        id: userRole.user_id,
-        email: authUser?.email || 'Unknown',
-        full_name: profile?.full_name || 'Unknown',
-        role: userRole.role as UserRole,
-        created_at: authUser?.created_at || '',
-        last_sign_in_at: authUser?.last_sign_in_at || null
-      };
-    });
-
-    return usersWithRoles;
+    // Transform the data to match our expected format
+    return (data || []).map((item: any) => ({
+      id: item.user_id,
+      role: item.role as UserRole,
+      full_name: item.profiles?.full_name || 'Unknown User'
+    }));
   } catch (error) {
     console.error('Error in getAllUsersWithRoles:', error);
     return [];
   }
-}
+};
 
-export async function updateUserRole(userId: string, newRole: UserRole): Promise<boolean> {
+export const updateUserRole = async (userId: string, newRole: UserRole): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('user_roles')
-      .update({ role: newRole, updated_at: new Date().toISOString() })
+      .update({ role: newRole })
       .eq('user_id', userId);
 
     if (error) {
@@ -76,53 +84,12 @@ export async function updateUserRole(userId: string, newRole: UserRole): Promise
     console.error('Error in updateUserRole:', error);
     return false;
   }
-}
+};
 
-export async function deleteUser(userId: string): Promise<boolean> {
-  try {
-    // Delete from auth (this will cascade to user_roles and profiles)
-    const { error } = await supabase.auth.admin.deleteUser(userId);
+export const canAccessAdminFeatures = (role: UserRole | null): boolean => {
+  return role === 'admin';
+};
 
-    if (error) {
-      console.error('Error deleting user:', error);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Error in deleteUser:', error);
-    return false;
-  }
-}
-
-export async function createAdminUser(email: string, password: string, fullName: string): Promise<boolean> {
-  try {
-    // Create the user
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password,
-      user_metadata: { full_name: fullName }
-    });
-
-    if (error || !data.user) {
-      console.error('Error creating admin user:', error);
-      return false;
-    }
-
-    // Update their role to admin
-    const { error: roleError } = await supabase
-      .from('user_roles')
-      .update({ role: 'admin' })
-      .eq('user_id', data.user.id);
-
-    if (roleError) {
-      console.error('Error setting admin role:', roleError);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Error in createAdminUser:', error);
-    return false;
-  }
-}
+export const canAccessConsultantFeatures = (role: UserRole | null): boolean => {
+  return role === 'admin' || role === 'consultant';
+};
