@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -28,25 +29,28 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Protected Route Component
+// Optional Protected Route Component (only for admin features)
 function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: 'admin' | 'consultant' }) {
   const { user } = useAuth();
   const { role, loading } = useUserRole();
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
+  // Only require auth for admin routes
+  if (requiredRole === 'admin') {
+    if (!user) {
+      return <Navigate to="/auth" replace />;
+    }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
-      </div>
-    );
-  }
+    if (loading) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        </div>
+      );
+    }
 
-  if (requiredRole && role !== requiredRole && role !== 'admin') {
-    return <Navigate to="/dashboard" replace />;
+    if (role !== 'admin') {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;
@@ -54,70 +58,26 @@ function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode;
 
 // App Routes Component
 function AppRoutes() {
-  const { user } = useAuth();
-
   return (
     <div className="min-h-screen bg-background">
       <EnhancedNavigation />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/weather-alerts"
-          element={
-            <ProtectedRoute>
-              <WeatherAlerts />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/disease-detection"
-          element={
-            <ProtectedRoute>
-              <DiseaseDetection />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/expert-consultation"
-          element={
-            <ProtectedRoute>
-              <ExpertConsultation />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/spray-schedule"
-          element={
-            <ProtectedRoute>
-              <SpraySchedule />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        
+        {/* Public Routes - No Authentication Required */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/weather-alerts" element={<WeatherAlerts />} />
+        <Route path="/disease-detection" element={<DiseaseDetection />} />
+        <Route path="/expert-consultation" element={<ExpertConsultation />} />
+        <Route path="/spray-schedule" element={<SpraySchedule />} />
+        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/integrations" element={<Integrations />} />
+        
+        {/* User Profile - Optional Authentication */}
+        <Route path="/profile" element={<Profile />} />
+        
+        {/* Admin Routes - Require Authentication */}
         <Route
           path="/admin"
           element={
@@ -135,14 +95,6 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/expert-call/:consultationId"
-          element={
-            <ProtectedRoute>
-              <ExpertCall />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/call-monitor"
           element={
             <ProtectedRoute requiredRole="admin">
@@ -150,14 +102,10 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/integrations"
-          element={
-            <ProtectedRoute>
-              <Integrations />
-            </ProtectedRoute>
-          }
-        />
+        
+        {/* Expert Call - For authenticated users */}
+        <Route path="/expert-call/:consultationId" element={<ExpertCall />} />
+        
         <Route path="*" element={<NotFound />} />
       </Routes>
       <OfflineIndicator />

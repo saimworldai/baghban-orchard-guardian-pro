@@ -21,15 +21,21 @@ import {
   BarChart3,
   Shield,
   Home,
-  HelpCircle
+  HelpCircle,
+  Leaf,
+  Globe
 } from "lucide-react";
 
 const publicNavItems = [
   { name: "Home", path: "/", icon: Home },
-  { name: "Try Demo", path: "/#demo", icon: Brain },
+  { name: "Disease Detection", path: "/disease-detection", icon: Brain },
+  { name: "Weather Alerts", path: "/weather-alerts", icon: CloudRain },
+  { name: "Expert Consultation", path: "/expert-consultation", icon: Users },
+  { name: "Spray Schedule", path: "/spray-schedule", icon: Calendar },
+  { name: "Analytics", path: "/analytics", icon: BarChart3 },
 ];
 
-const navItems = [
+const authNavItems = [
   { name: "Dashboard", path: "/dashboard", icon: Home },
   { name: "Disease Detection", path: "/disease-detection", icon: Brain },
   { name: "Weather Alerts", path: "/weather-alerts", icon: CloudRain },
@@ -51,17 +57,7 @@ export function EnhancedNavigation() {
     setIsOpen(false);
   };
 
-  const currentNavItems = user ? navItems : publicNavItems;
-
-  const scrollToDemo = () => {
-    const demoSection = document.querySelector('#demo') || 
-                       document.querySelector('[aria-label*="demo"]') ||
-                       document.querySelector('.PublicDemoSection');
-    if (demoSection) {
-      demoSection.scrollIntoView({ behavior: 'smooth' });
-    }
-    setIsOpen(false);
-  };
+  const currentNavItems = user ? authNavItems : publicNavItems;
 
   return (
     <motion.nav 
@@ -88,7 +84,10 @@ export function EnhancedNavigation() {
                 <h1 className="text-xl font-black bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
                   Baghban Guardian
                 </h1>
-                <p className="text-xs text-gray-500 -mt-1">AI-Powered Agriculture</p>
+                <p className="text-xs text-gray-500 -mt-1 flex items-center gap-1">
+                  <Globe className="h-3 w-3" />
+                  Free for Everyone
+                </p>
               </div>
             </NavLink>
           </motion.div>
@@ -102,32 +101,19 @@ export function EnhancedNavigation() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                {item.path === "/#demo" ? (
-                  <Button
-                    variant="ghost"
-                    onClick={scrollToDemo}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-green-50 transition-all duration-200 group"
-                  >
-                    <item.icon className="h-4 w-4 text-gray-600 group-hover:text-green-600 transition-colors" />
-                    <span className="font-medium text-gray-700 group-hover:text-green-700">
-                      {item.name}
-                    </span>
-                  </Button>
-                ) : (
-                  <NavLink 
-                    to={item.path}
-                    className={({ isActive }) => 
-                      `flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 group ${
-                        isActive 
-                          ? 'bg-green-100 text-green-700 shadow-md' 
-                          : 'hover:bg-green-50 text-gray-700 hover:text-green-700'
-                      }`
-                    }
-                  >
-                    <item.icon className="h-4 w-4 transition-colors" />
-                    <span className="font-medium">{item.name}</span>
-                  </NavLink>
-                )}
+                <NavLink 
+                  to={item.path}
+                  className={({ isActive }) => 
+                    `flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 group ${
+                      isActive 
+                        ? 'bg-green-100 text-green-700 shadow-md' 
+                        : 'hover:bg-green-50 text-gray-700 hover:text-green-700'
+                    }`
+                  }
+                >
+                  <item.icon className="h-4 w-4 transition-colors" />
+                  <span className="font-medium">{item.name}</span>
+                </NavLink>
               </motion.div>
             ))}
 
@@ -170,7 +156,7 @@ export function EnhancedNavigation() {
                     className="relative hover:bg-green-50"
                   >
                     <Bell className="h-5 w-5" />
-                    <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
+                    <Badge className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center bg-green-500 text-white text-xs">
                       3
                     </Badge>
                   </Button>
@@ -227,6 +213,10 @@ export function EnhancedNavigation() {
               </>
             ) : (
               <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full border border-green-200">
+                  <Leaf className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-700">All features free!</span>
+                </div>
                 <NavLink to="/auth">
                   <Button variant="ghost" className="hover:bg-green-50">
                     Sign In
@@ -234,7 +224,7 @@ export function EnhancedNavigation() {
                 </NavLink>
                 <NavLink to="/auth">
                   <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg">
-                    Get Started Free
+                    Join Community
                   </Button>
                 </NavLink>
               </div>
@@ -266,33 +256,21 @@ export function EnhancedNavigation() {
             >
               <div className="space-y-2">
                 {currentNavItems.map((item) => (
-                  <div key={item.name}>
-                    {item.path === "/#demo" ? (
-                      <Button
-                        variant="ghost"
-                        onClick={scrollToDemo}
-                        className="w-full justify-start flex items-center gap-3 px-4 py-3 hover:bg-green-50"
-                      >
-                        <item.icon className="h-5 w-5 text-gray-600" />
-                        <span className="font-medium">{item.name}</span>
-                      </Button>
-                    ) : (
-                      <NavLink 
-                        to={item.path}
-                        onClick={() => setIsOpen(false)}
-                        className={({ isActive }) => 
-                          `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                            isActive 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'hover:bg-green-50 text-gray-700'
-                          }`
-                        }
-                      >
-                        <item.icon className="h-5 w-5" />
-                        <span className="font-medium">{item.name}</span>
-                      </NavLink>
-                    )}
-                  </div>
+                  <NavLink 
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive }) => 
+                      `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                        isActive 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'hover:bg-green-50 text-gray-700'
+                      }`
+                    }
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span className="font-medium">{item.name}</span>
+                  </NavLink>
                 ))}
 
                 {user && role === 'admin' && (
@@ -337,6 +315,10 @@ export function EnhancedNavigation() {
                     </div>
                   ) : (
                     <div className="space-y-2">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200 mb-3">
+                        <Leaf className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-700">All features free for everyone!</span>
+                      </div>
                       <NavLink 
                         to="/auth"
                         onClick={() => setIsOpen(false)}
@@ -352,7 +334,7 @@ export function EnhancedNavigation() {
                         className="block"
                       >
                         <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white">
-                          Get Started Free
+                          Join Community
                         </Button>
                       </NavLink>
                     </div>
