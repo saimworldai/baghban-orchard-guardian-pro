@@ -7,7 +7,6 @@ import { FeaturesGrid } from '@/components/home/FeaturesGrid';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { CTASection } from '@/components/home/CTASection';
 import { BackgroundElements } from '@/components/home/BackgroundElements';
-import { PublicDemoSection } from '@/components/home/PublicDemoSection';
 import { useAuth } from '@/contexts/AuthProvider';
 
 const Index = () => {
@@ -19,7 +18,6 @@ const Index = () => {
       
       <div className="container mx-auto px-4 py-16">
         <EnhancedHeroSection />
-        <PublicDemoSection />
         <StatsSection />
         <FeaturesGrid />
         <TestimonialsSection />
