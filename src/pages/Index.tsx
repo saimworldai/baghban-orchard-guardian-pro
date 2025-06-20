@@ -7,18 +7,11 @@ import { FeaturesGrid } from '@/components/home/FeaturesGrid';
 import { TestimonialsSection } from '@/components/home/TestimonialsSection';
 import { CTASection } from '@/components/home/CTASection';
 import { BackgroundElements } from '@/components/home/BackgroundElements';
+import { PublicDemoSection } from '@/components/home/PublicDemoSection';
 import { useAuth } from '@/contexts/AuthProvider';
 
 const Index = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-
-  // If user is logged in, redirect to dashboard
-  React.useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 relative overflow-hidden">
@@ -26,6 +19,7 @@ const Index = () => {
       
       <div className="container mx-auto px-4 py-16">
         <EnhancedHeroSection />
+        <PublicDemoSection />
         <StatsSection />
         <FeaturesGrid />
         <TestimonialsSection />

@@ -12,6 +12,15 @@ export function CTASection() {
     navigate('/auth');
   };
 
+  const scrollToDemo = () => {
+    const demoSection = document.querySelector('#demo') || 
+                       document.querySelector('[aria-label*="demo"]') ||
+                       document.querySelector('.PublicDemoSection');
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 50 }}
@@ -67,7 +76,7 @@ export function CTASection() {
           >
             <Sparkles className="h-5 w-5 text-white" />
           </motion.div>
-          <span className="text-white font-semibold">Ready to Transform Your Orchard?</span>
+          <span className="text-white font-semibold">Ready to Transform Your Farm?</span>
         </motion.div>
 
         <motion.h2
@@ -76,10 +85,10 @@ export function CTASection() {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="text-4xl md:text-6xl font-bold text-white mb-6"
         >
-          Start Your Journey to
+          Experience Smart Farming
           <br />
           <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-            Better Harvests
+            Today, For Free
           </span>
         </motion.h2>
 
@@ -89,8 +98,8 @@ export function CTASection() {
           transition={{ delay: 0.6, duration: 0.6 }}
           className="text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          Join thousands of successful farmers who have increased their yields by up to 45% 
-          with our AI-powered orchard management platform.
+          Try our AI-powered tools instantly - no signup required! 
+          Join thousands of farmers increasing yields by 45% with our platform.
         </motion.p>
 
         <motion.div
@@ -101,18 +110,22 @@ export function CTASection() {
         >
           <Button
             size="lg"
+            onClick={scrollToDemo}
             className="bg-white text-green-700 hover:bg-gray-100 px-12 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group border-0"
-            onClick={handleGetStarted}
           >
             <Rocket className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
-            Start Free Trial
+            Try Demo Now
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
 
-          <div className="flex items-center gap-2 text-white/80">
-            <Shield className="h-4 w-4" />
-            <span className="text-sm font-medium">No credit card required</span>
-          </div>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={handleGetStarted}
+            className="border-2 border-white text-white hover:bg-white hover:text-green-700 px-12 py-4 text-lg font-bold transition-all duration-300"
+          >
+            Sign Up for Full Access
+          </Button>
         </motion.div>
 
         <motion.div
@@ -124,7 +137,7 @@ export function CTASection() {
           {[
             { icon: Users, text: "15K+ Farmers" },
             { icon: Star, text: "4.9★ Rating" },
-            { icon: Shield, text: "Enterprise Security" }
+            { icon: Shield, text: "Free to Try" }
           ].map((item, index) => (
             <motion.div
               key={index}
