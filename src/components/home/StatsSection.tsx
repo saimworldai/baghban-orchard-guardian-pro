@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, Users, Award, Zap, LeafyGreen, BarChart3, Shield, Clock, Star, CheckCircle } from 'lucide-react';
@@ -59,7 +60,7 @@ const statVariants = {
     y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 100,
       damping: 15
     }
@@ -108,7 +109,7 @@ export function StatsSection() {
             whileHover={{ 
               y: -10, 
               scale: 1.05,
-              transition: { type: "spring", stiffness: 300 }
+              transition: { type: "spring" as const, stiffness: 300 }
             }}
             className="text-center group"
           >
@@ -146,7 +147,7 @@ export function StatsSection() {
             <motion.div
               initial={{ scale: 0 }}
               whileInView={{ scale: 1 }}
-              transition={{ delay: 0.3 + index * 0.1, duration: 0.5, type: "spring" }}
+              transition={{ delay: 0.3 + index * 0.1, duration: 0.5, type: "spring" as const }}
               className="mb-2"
             >
               <span className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
