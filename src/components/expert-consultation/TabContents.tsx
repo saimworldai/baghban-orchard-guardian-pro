@@ -22,8 +22,8 @@ const contentVariants = {
     rotateX: 0,
     transition: { 
       duration: 0.6, 
-      ease: "easeOut",
-      type: "spring",
+      ease: "easeOut" as const,
+      type: "spring" as const,
       stiffness: 100
     }
   },

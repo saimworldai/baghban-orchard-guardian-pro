@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
@@ -11,7 +12,7 @@ const heroVariants = {
     y: 0,
     transition: {
       duration: 0.8,
-      ease: "easeOut",
+      ease: "easeOut" as const,
       staggerChildren: 0.2
     }
   }
@@ -22,7 +23,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: "easeOut" }
+    transition: { duration: 0.6, ease: "easeOut" as const }
   }
 };
 
@@ -155,7 +156,7 @@ export function HeroSection() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <motion.div
                       whileHover={{ scale: 1.2, rotate: 10 }}
-                      transition={{ type: "spring", stiffness: 300 }}
+                      transition={{ type: "spring" as const, stiffness: 300 }}
                       className="relative"
                     >
                       <feature.icon className="h-12 w-12 text-white drop-shadow-lg" />
