@@ -7,12 +7,15 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import { EnhancedNavigation } from "@/components/navigation/EnhancedNavigation";
 import { OfflineIndicator } from "@/components/offline/OfflineIndicator";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
-import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { EnhancedErrorBoundary } from "@/components/ui/enhanced-error-boundary";
 import { SkipToContent } from "@/components/accessibility/SkipToContent";
 import { InstallPWA } from "@/components/advanced/InstallPWA";
+import { HelpPanel } from "@/components/ui/help-panel";
 import { useAuth } from "@/contexts/AuthProvider";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { ThemeProvider } from "next-themes";
+import { useNavigate } from "react-router-dom";
 
 // Import pages
 import Index from "./pages/Index";
@@ -44,7 +47,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Optional Protected Route Component (only for admin features)
+// Protected Route Component (only for admin features)
 function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: 'admin' | 'consultant' }) {
   const { user } = useAuth();
   const { role, loading } = useUserRole();
@@ -71,8 +74,40 @@ function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode;
   return <>{children}</>;
 }
 
-// App Routes Component
+// App Routes Component with keyboard shortcuts
 function AppRoutes() {
+  const navigate = useNavigate();
+
+  // Global keyboard shortcuts
+  useKeyboardShortcuts([
+    {
+      key: 'k',
+      ctrlKey: true,
+      callback: () => {
+        // Focus on search if available, or navigate to a search page
+        const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      },
+      description: 'Open search'
+    },
+    {
+      key: 'd',
+      ctrlKey: true,
+      callback: () => navigate('/dashboard'),
+      description: 'Go to dashboard'
+    },
+    {
+      key: 'h',
+      ctrlKey: true,
+      callback: () => {
+        // This will be handled by the HelpPanel component
+      },
+      description: 'Open help panel'
+    },
+  ]);
+
   return (
     <div className="min-h-screen bg-background">
       <SkipToContent />
@@ -129,13 +164,14 @@ function AppRoutes() {
       <OfflineIndicator />
       <PWAInstallPrompt />
       <InstallPWA />
+      <HelpPanel />
     </div>
   );
 }
 
 function App() {
   return (
-    <ErrorBoundary>
+    <EnhancedErrorBoundary>
       <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
@@ -148,7 +184,7 @@ function App() {
           </TooltipProvider>
         </QueryClientProvider>
       </ThemeProvider>
-    </ErrorBoundary>
+    </EnhancedErrorBoundary>
   );
 }
 
