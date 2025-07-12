@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      consultations: {
+        Row: {
+          completed_at: string | null
+          consultant_id: string | null
+          created_at: string
+          farmer_id: string
+          id: string
+          scheduled_at: string | null
+          status: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          consultant_id?: string | null
+          created_at?: string
+          farmer_id: string
+          id?: string
+          scheduled_at?: string | null
+          status: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          consultant_id?: string | null
+          created_at?: string
+          farmer_id?: string
+          id?: string
+          scheduled_at?: string | null
+          status?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      disease_detections: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          crop_type: string | null
+          detected_disease: string | null
+          id: string
+          image_url: string
+          recommendations: string | null
+          user_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          crop_type?: string | null
+          detected_disease?: string | null
+          id?: string
+          image_url: string
+          recommendations?: string | null
+          user_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          crop_type?: string | null
+          detected_disease?: string | null
+          id?: string
+          image_url?: string
+          recommendations?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      experts: {
+        Row: {
+          available: boolean
+          bio: string | null
+          created_at: string
+          experience: string | null
+          id: string
+          image_url: string | null
+          languages: string[]
+          name: string
+          price_per_minute: number | null
+          rating: number
+          specialty: string
+          updated_at: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          available?: boolean
+          bio?: string | null
+          created_at?: string
+          experience?: string | null
+          id?: string
+          image_url?: string | null
+          languages?: string[]
+          name: string
+          price_per_minute?: number | null
+          rating?: number
+          specialty: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          available?: boolean
+          bio?: string | null
+          created_at?: string
+          experience?: string | null
+          id?: string
+          image_url?: string | null
+          languages?: string[]
+          name?: string
+          price_per_minute?: number | null
+          rating?: number
+          specialty?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -38,6 +158,51 @@ export type Database = {
           id?: string
           location?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      spray_schedules: {
+        Row: {
+          chemical_name: string
+          completed: boolean
+          created_at: string
+          crop_name: string
+          dosage: string
+          id: string
+          notes: string | null
+          spray_date: string
+          target_pest: string | null
+          updated_at: string
+          user_id: string
+          weather_conditions: string | null
+        }
+        Insert: {
+          chemical_name: string
+          completed?: boolean
+          created_at?: string
+          crop_name: string
+          dosage: string
+          id?: string
+          notes?: string | null
+          spray_date: string
+          target_pest?: string | null
+          updated_at?: string
+          user_id: string
+          weather_conditions?: string | null
+        }
+        Update: {
+          chemical_name?: string
+          completed?: boolean
+          created_at?: string
+          crop_name?: string
+          dosage?: string
+          id?: string
+          notes?: string | null
+          spray_date?: string
+          target_pest?: string | null
+          updated_at?: string
+          user_id?: string
+          weather_conditions?: string | null
         }
         Relationships: []
       }
