@@ -95,18 +95,9 @@ export const enhancedToast = {
     }
   ) => {
     return sonnerToast.promise(promise, {
-      loading: {
-        title: loading,
-        icon: <Zap className="h-4 w-4 animate-pulse" />,
-      },
-      success: (data) => ({
-        title: typeof success === 'function' ? success(data) : success,
-        icon: <CheckCircle className="h-4 w-4" />,
-      }),
-      error: (err) => ({
-        title: typeof error === 'function' ? error(err) : error,
-        icon: <XCircle className="h-4 w-4" />,
-      }),
+      loading: loading,
+      success: (data) => typeof success === 'function' ? success(data) : success,
+      error: (err) => typeof error === 'function' ? error(err) : error,
     });
   },
 };
