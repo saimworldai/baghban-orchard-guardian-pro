@@ -24,20 +24,18 @@ export function Navigation() {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+    { name: 'Plant Care Guide', href: '/plant-care', icon: BarChart3 },
     { name: 'Weather', href: '/weather-alerts', icon: CloudRain },
-    { name: 'Disease Detection', href: '/disease-detection', icon: Microscope, badge: 'AI' },
-    { name: 'Expert Help', href: '/expert-consultation', icon: Users, badge: 'Free' },
-    { name: 'Spray Schedule', href: '/spray-schedule', icon: Calendar },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Integrations', href: '/integrations', icon: Settings },
+    { name: 'Plant Doctor', href: '/disease-detection', icon: Microscope, badge: 'AI' },
+    { name: 'Community', href: '/community', icon: Users },
+    { name: 'Garden Calendar', href: '/garden-calendar', icon: Calendar },
   ];
 
   return (
     <div className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 flex justify-between items-center h-16">
         <NavLink to="/" className="text-lg font-semibold">
-          Orchard Management
+          PlantCare Pro
         </NavLink>
         
         <div className="hidden md:flex items-center space-x-8">

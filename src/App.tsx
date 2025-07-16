@@ -19,6 +19,9 @@ import { useNavigate } from "react-router-dom";
 
 // Import pages
 import Index from "./pages/Index";
+import PlantCare from "./pages/PlantCare";
+import Community from "./pages/Community";
+import GardenCalendar from "./pages/GardenCalendar";
 import Dashboard from "./pages/Dashboard";
 import WeatherAlerts from "./pages/WeatherAlerts";
 import DiseaseDetection from "./pages/DiseaseDetection";
@@ -118,13 +121,16 @@ function AppRoutes() {
           <Route path="/auth" element={<Auth />} />
           
           {/* Public Routes - No Authentication Required */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/plant-care" element={<PlantCare />} />
           <Route path="/weather-alerts" element={<WeatherAlerts />} />
           <Route path="/disease-detection" element={<DiseaseDetection />} />
-          <Route path="/expert-consultation" element={<ExpertConsultation />} />
-          <Route path="/spray-schedule" element={<SpraySchedule />} />
+          <Route path="/community" element={<Community />} />
+          <Route path="/garden-calendar" element={<GardenCalendar />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/integrations" element={<Integrations />} />
+          <Route path="/expert-consultation" element={<ExpertConsultation />} />
+          <Route path="/spray-schedule" element={<SpraySchedule />} />
           
           {/* User Profile - Optional Authentication */}
           <Route path="/profile" element={<Profile />} />
