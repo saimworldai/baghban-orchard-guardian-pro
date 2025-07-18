@@ -32,3 +32,7 @@ export { SortSelect } from './SortSelect';
 export { FilterPopover } from './FilterPopover';
 export { ExpertsGrid } from './ExpertsGrid';
 export { NoResultsMessage } from './NoResultsMessage';
+export { ChatInterface } from './ChatInterface';
+export { LiveVideoInterface } from './LiveVideoInterface';
+export { ConsultationQueue } from './ConsultationQueue';
+export { QuickConsultationCard } from './QuickConsultationCard';

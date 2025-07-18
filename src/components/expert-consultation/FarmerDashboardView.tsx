@@ -9,18 +9,79 @@ import { SmartNotifications } from './SmartNotifications';
 import { DailyTipsCarousel } from './DailyTipsCarousel';
 import { LanguageSupport } from './LanguageSupport';
 import { AdvancedFeaturesSection } from './AdvancedFeaturesSection';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Users } from 'lucide-react';
+import { Users, Video, MessageSquare, Clock, Star, Zap } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
+import { QuickConsultationCard } from './QuickConsultationCard';
+import { ConsultationQueue } from './ConsultationQueue';
+import { ChatInterface } from './ChatInterface';
 
 export function FarmerDashboardView() {
   const [activeTab, setActiveTab] = useState('experts');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
 
   const handleStartCall = () => {
     setActiveTab('video');
+  };
+
+  // Mock featured experts data
+  const featuredExperts = [
+    {
+      id: '1',
+      name: 'Dr. Priya Sharma',
+      specialty: 'Plant Disease Specialist',
+      rating: 4.9,
+      languages: ['Hindi', 'English', 'Punjabi'],
+      available: true,
+      responseTime: 'Avg 2 min',
+      location: 'Delhi, India',
+      verified: true,
+      experience: '15 years',
+      consultations: 1250,
+      imageUrl: '/placeholder.svg'
+    },
+    {
+      id: '2',
+      name: 'Dr. Rajesh Kumar',
+      specialty: 'Crop Management Expert',
+      rating: 4.8,
+      languages: ['Hindi', 'English'],
+      available: true,
+      responseTime: 'Avg 3 min',
+      location: 'Punjab, India',
+      verified: true,
+      experience: '12 years',
+      consultations: 980,
+      imageUrl: '/placeholder.svg'
+    },
+    {
+      id: '3',
+      name: 'Dr. Anita Patel',
+      specialty: 'Organic Farming Consultant',
+      rating: 4.9,
+      languages: ['Gujarati', 'Hindi', 'English'],
+      available: false,
+      responseTime: 'Avg 5 min',
+      location: 'Gujarat, India',
+      verified: true,
+      experience: '18 years',
+      consultations: 1500,
+      imageUrl: '/placeholder.svg'
+    }
+  ];
+
+  const handleToggleChat = () => {
+    setShowChat(!showChat);
+    setIsChatMinimized(false);
+  };
+
+  const handleMinimizeChat = () => {
+    setIsChatMinimized(true);
+    setShowChat(false);
   };
 
   return (
@@ -34,13 +95,111 @@ export function FarmerDashboardView() {
         <HeaderSection onStartCall={handleStartCall} />
       </motion.div>
       
-      {/* Main Tabs */}
+      {/* Quick Actions Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6"
+      >
+        <Card className="relative overflow-hidden border-green-200 bg-gradient-to-br from-green-50 to-green-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-green-200">
+                <Video className="h-5 w-5 text-green-700" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-green-800">Instant Call</h3>
+                <p className="text-xs text-green-600">Connect now</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-blue-200">
+                <MessageSquare className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-blue-800">Quick Chat</h3>
+                <p className="text-xs text-blue-600">Get help fast</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-purple-200">
+                <Clock className="h-5 w-5 text-purple-700" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-purple-800">Schedule</h3>
+                <p className="text-xs text-purple-600">Book later</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="relative overflow-hidden border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100/50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-full bg-orange-200">
+                <Zap className="h-5 w-5 text-orange-700" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-orange-800">Emergency</h3>
+                <p className="text-xs text-orange-600">Urgent help</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Featured Experts Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mb-6"
+      >
+        <Card className="border-primary/20">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl text-primary flex items-center gap-2">
+                <Star className="h-5 w-5 text-yellow-500" />
+                Featured Experts Available Now
+              </CardTitle>
+              <Button variant="outline" size="sm" onClick={() => setActiveTab('experts')}>
+                View All
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {featuredExperts.map((expert) => (
+                <QuickConsultationCard
+                  key={expert.id}
+                  expert={expert}
+                  onStartCall={() => handleStartCall()}
+                  onStartChat={handleToggleChat}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <motion.div 
           className="lg:col-span-2"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
         >
           <TabsSection activeTab={activeTab} onTabChange={setActiveTab} />
         </motion.div>
@@ -49,8 +208,11 @@ export function FarmerDashboardView() {
           className="space-y-6"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
+          {/* Consultation Queue */}
+          <ConsultationQueue onSelectConsultation={(id) => console.log('Selected:', id)} />
+          
           {/* Smart Notifications */}
           <SmartNotifications />
           
@@ -58,24 +220,24 @@ export function FarmerDashboardView() {
           <DailyTipsCarousel />
           
           {/* Group Consultations Feature */}
-          <Card className="overflow-hidden border-green-100 shadow-sm hover:shadow-md transition-shadow duration-300">
+          <Card className="overflow-hidden border-primary/20 shadow-sm hover:shadow-md transition-shadow duration-300">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-full bg-purple-100">
                   <Users className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold">Group Consultations</h3>
-                  <p className="text-sm text-gray-600">Join topic-based sessions with other farmers</p>
+                  <h3 className="font-semibold text-primary">Group Consultations</h3>
+                  <p className="text-sm text-muted-foreground">Join topic-based sessions with other farmers</p>
                 </div>
               </div>
               
               <div className="space-y-3">
-                <div className="bg-gradient-to-br from-gray-50 to-purple-50 p-3 rounded-md border border-purple-100">
-                  <h4 className="font-medium text-sm">Upcoming Webinar</h4>
-                  <p className="text-sm">Winter Orchard Preparation</p>
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 p-3 rounded-md border border-purple-200">
+                  <h4 className="font-medium text-sm text-purple-800">Upcoming Webinar</h4>
+                  <p className="text-sm text-purple-700">Winter Orchard Preparation</p>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">Nov 15, 2023 • 3:00 PM</span>
+                    <span className="text-xs text-purple-600">Nov 15, 2023 • 3:00 PM</span>
                     <Button variant="outline" size="sm" onClick={() => toast.info("Group session feature coming soon")} 
                       className="border-purple-200 text-purple-700 hover:bg-purple-50">
                       Join for ₹20
@@ -83,11 +245,11 @@ export function FarmerDashboardView() {
                   </div>
                 </div>
                 
-                <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-3 rounded-md border border-blue-100">
-                  <h4 className="font-medium text-sm">Upcoming Webinar</h4>
-                  <p className="text-sm">Pest Management for Apple Trees</p>
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 p-3 rounded-md border border-blue-200">
+                  <h4 className="font-medium text-sm text-blue-800">Upcoming Webinar</h4>
+                  <p className="text-sm text-blue-700">Pest Management for Apple Trees</p>
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-xs text-gray-500">Nov 20, 2023 • 4:30 PM</span>
+                    <span className="text-xs text-blue-600">Nov 20, 2023 • 4:30 PM</span>
                     <Button variant="outline" size="sm" onClick={() => toast.info("Group session feature coming soon")}
                       className="border-blue-200 text-blue-700 hover:bg-blue-50">
                       Join for ₹15
@@ -185,10 +347,37 @@ export function FarmerDashboardView() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
       >
         <HistorySection />
       </motion.div>
+
+      {/* Floating Chat Interface */}
+      {showChat && !isChatMinimized && (
+        <motion.div
+          initial={{ opacity: 0, x: 400 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 400 }}
+          className="fixed bottom-4 right-4 z-50 w-80"
+        >
+          <ChatInterface
+            consultationId="chat-demo"
+            onToggleMinimize={handleMinimizeChat}
+          />
+        </motion.div>
+      )}
+
+      {/* Minimized Chat Button */}
+      {(isChatMinimized || (!showChat && isChatMinimized)) && (
+        <ChatInterface
+          consultationId="chat-demo"
+          isMinimized={true}
+          onToggleMinimize={() => {
+            setShowChat(true);
+            setIsChatMinimized(false);
+          }}
+        />
+      )}
     </div>
   );
 }
