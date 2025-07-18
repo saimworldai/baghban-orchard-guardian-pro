@@ -1,9 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Umbrella } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
-import HourlyForecast from '@/components/weather/HourlyForecast';
+import { toast } from '@/hooks/use-toast';
 import { useLocationState } from '@/hooks/use-location';
 import { 
   getWeatherByCoords, 
@@ -17,15 +15,12 @@ import { WeatherControls } from '@/components/weather/WeatherControls';
 import { CurrentWeatherCard } from '@/components/weather/CurrentWeatherCard';
 import { ForecastCard } from '@/components/weather/ForecastCard';
 import { WeatherStatus } from '@/components/weather/WeatherStatus';
-import { WeatherSummary } from '@/components/weather/WeatherSummary';
-import { DetailedWeatherGrid } from '@/components/weather/DetailedWeatherGrid';
-import { WeatherInsights } from '@/components/weather/WeatherInsights';
-import { QuickActions } from '@/components/weather/QuickActions';
 import { AISprayRecommendations } from '@/components/weather/AISprayRecommendations';
 import { LiveLocationTracker } from '@/components/weather/LiveLocationTracker';
-import { WeatherPerformanceMonitor } from '@/components/weather/WeatherPerformanceMonitor';
 import { WeatherAlerts } from '@/components/weather/WeatherAlerts';
-import { WeatherComparison } from '@/components/weather/WeatherComparison';
+import { FarmWeatherDashboard } from '@/components/weather/FarmWeatherDashboard';
+import { CropConditionsWidget } from '@/components/weather/CropConditionsWidget';
+import { IrrigationScheduler } from '@/components/weather/IrrigationScheduler';
 
 const WeatherAlertsPage: React.FC = () => {
   const { 
@@ -246,10 +241,7 @@ const WeatherAlertsPage: React.FC = () => {
       <Card className="overflow-hidden border border-white/20 shadow-xl backdrop-blur-md bg-white/80">
         <CardContent className="p-6">
           <div className="space-y-6">
-            {/* Performance Monitor */}
-            <WeatherPerformanceMonitor />
-
-            {/* Enhanced Live Location Tracker */}
+            {/* Live Location Tracker */}
             <LiveLocationTracker 
               onLocationUpdate={handleLiveLocationUpdate}
               autoTrack={false}
@@ -277,46 +269,35 @@ const WeatherAlertsPage: React.FC = () => {
 
             {currentWeather && currentWeather.data && (
               <>
-                <WeatherSummary 
+                {/* Main Farm Weather Dashboard */}
+                <FarmWeatherDashboard 
                   currentWeather={currentWeather}
+                  forecast={forecast}
+                  location={location}
                   lastUpdated={lastUpdated}
-                  isOnline={isOnline}
-                  location={location}
                 />
 
-                <CurrentWeatherCard currentWeather={currentWeather} />
-
-                {/* Weather Comparison */}
-                <WeatherComparison 
-                  currentWeather={currentWeather}
-                  location={location}
-                />
-
-                {/* Enhanced AI Spray Recommendations */}
+                {/* AI Spray Recommendations */}
                 <AISprayRecommendations 
                   currentWeather={currentWeather}
                   location={location}
                 />
 
-                <DetailedWeatherGrid currentWeather={currentWeather} />
+                {/* Crop Conditions Widget */}
+                <CropConditionsWidget 
+                  currentWeather={currentWeather}
+                  forecast={forecast}
+                />
 
-                <WeatherInsights currentWeather={currentWeather} />
+                {/* Irrigation Scheduler */}
+                <IrrigationScheduler 
+                  currentWeather={currentWeather}
+                  forecast={forecast}
+                />
 
-                <QuickActions weatherData={currentWeather} location={location} />
-
-                {forecast && forecast.data[0].hour && (
-                  <div className="mb-8">
-                    <HourlyForecast hours={forecast.data[0].hour} />
-                  </div>
-                )}
-
-                <h2 className="text-xl font-semibold mb-6 text-blue-800 flex items-center">
-                  <Umbrella className="mr-2 h-5 w-5" />
-                  15-Day Forecast & AI Spray Recommendations
-                </h2>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                  {forecast?.data.map((day, index) => (
+                {/* Weekly Forecast */}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                  {forecast?.data.slice(0, 7).map((day, index) => (
                     <ForecastCard key={index} day={day} index={index} />
                   ))}
                 </div>
