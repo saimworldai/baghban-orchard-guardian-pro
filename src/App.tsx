@@ -33,6 +33,7 @@ import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminConsultation from "./pages/AdminConsultation";
 import ExpertCall from "./pages/ExpertCall";
+import VideoCall from "./pages/VideoCall";
 import CallMonitor from "./pages/CallMonitor";
 import Integrations from "./pages/Integrations";
 import NotFound from "./pages/NotFound";
@@ -130,6 +131,8 @@ function AppRoutes() {
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/expert-consultation" element={<ExpertConsultation />} />
+          <Route path="/expert-consultation/video" element={<VideoCall />} />
+          <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
           <Route path="/spray-schedule" element={<SpraySchedule />} />
           
           {/* User Profile - Optional Authentication */}
@@ -161,8 +164,6 @@ function AppRoutes() {
             }
           />
           
-          {/* Expert Call - For authenticated users */}
-          <Route path="/expert-call/:consultationId" element={<ExpertCall />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

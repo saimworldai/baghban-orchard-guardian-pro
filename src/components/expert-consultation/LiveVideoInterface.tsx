@@ -104,8 +104,17 @@ export function LiveVideoInterface({
     toast.info(isRecording ? 'Recording stopped' : 'Recording started');
   };
 
-  const shareScreen = () => {
-    toast.info('Screen sharing feature coming soon');
+  const shareScreen = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: true
+      });
+      toast.success('Screen sharing started');
+      // In real implementation, replace video stream with screen share
+    } catch (error) {
+      toast.error('Could not start screen sharing');
+    }
   };
 
   const getConnectionIndicator = () => {

@@ -6,8 +6,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthProvider';
 import { toast } from '@/components/ui/sonner';
-import { Video, Clock, Calendar, Mic, Camera, User, Loader2 } from 'lucide-react';
+import { Video, Clock, Calendar, Mic, Camera, User, Loader2, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { EnhancedVideoCall } from './EnhancedVideoCall';
 
 // Define a type for connection information
 interface ConnectionInfo {
@@ -28,6 +29,7 @@ export function VideoCall() {
   const [availableMicrophones, setAvailableMicrophones] = useState<MediaDeviceInfo[]>([]);
   const [connectionQuality, setConnectionQuality] = useState<'excellent' | 'good' | 'poor'>('good');
   const [isCreatingCall, setIsCreatingCall] = useState(false);
+  const [showVideoCall, setShowVideoCall] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -196,13 +198,8 @@ export function VideoCall() {
         throw new Error('Failed to create consultation record');
       }
       
-      toast.success("Setting up your call with the next available expert");
-      // Stop all tracks before navigating
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      
-      navigate(`/expert-consultation/call/${data[0].id}`);
+      toast.success("Connecting to expert...");
+      setShowVideoCall(true);
     } catch (error) {
       console.error("Error setting up call:", error);
       toast.error("Failed to set up video call");
