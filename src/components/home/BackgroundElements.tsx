@@ -141,24 +141,24 @@ export function BackgroundElements() {
         ))}
       </div>
 
-      {/* Subtle particle effect */}
+      {/* Optimized particle effect */}
       <div className="absolute inset-0 -z-10">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {Array.from({ length: 8 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-green-300 rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
+              left: `${(i * 12.5) + Math.random() * 10}%`,
               top: `${Math.random() * 100}%`,
             }}
             animate={{
-              y: [0, -100, 0],
-              opacity: [0, 0.6, 0],
+              y: [0, -60, 0],
+              opacity: [0, 0.4, 0],
             }}
             transition={{
-              duration: 8 + Math.random() * 4,
+              duration: 6 + i * 0.5,
               repeat: Infinity,
-              delay: Math.random() * 8,
+              delay: i * 0.8,
               ease: "easeInOut"
             }}
           />

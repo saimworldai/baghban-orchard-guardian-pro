@@ -1,10 +1,11 @@
 
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useCallback } from 'react';
 import { EnhancedHeroSection } from '@/components/home/EnhancedHeroSection';
 import { BackgroundElements } from '@/components/home/BackgroundElements';
 import { useAuth } from '@/contexts/AuthProvider';
 import { motion } from 'framer-motion';
 import { enhancedToast } from '@/components/ui/enhanced-toast';
+import { debounce } from '@/utils/performance';
 
 // Lazy load essential components only
 const FeaturesGrid = lazy(() => import('@/components/home/FeaturesGrid').then(module => ({ default: module.FeaturesGrid })));
@@ -21,9 +22,11 @@ const SectionLoader = () => (
 const Index = () => {
   const { user } = useAuth();
 
-  // Welcome message for returning users
-  React.useEffect(() => {
-    if (user) {
+  // Optimized welcome message for returning users
+  const showWelcomeMessage = useCallback(
+    debounce((user: any) => {
+      if (!user) return;
+      
       const lastVisit = localStorage.getItem('lastVisit');
       const now = Date.now();
       
@@ -31,11 +34,17 @@ const Index = () => {
         enhancedToast.success(`Welcome back${user.email ? `, ${user.email.split('@')[0]}` : ''}!`, {
           description: 'Discover new plant care features.',
         });
+        localStorage.setItem('lastVisit', now.toString());
       }
-      
-      localStorage.setItem('lastVisit', now.toString());
+    }, 500),
+    []
+  );
+
+  React.useEffect(() => {
+    if (user) {
+      showWelcomeMessage(user);
     }
-  }, [user]);
+  }, [user, showWelcomeMessage]);
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">

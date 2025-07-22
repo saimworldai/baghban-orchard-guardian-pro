@@ -282,22 +282,21 @@ export function EnhancedHeroSection() {
                     </motion.div>
                   </div>
                   
-                  {/* Floating particles */}
-                  {[...Array(6)].map((_, i) => (
+                  {/* Optimized floating particles */}
+                  {[...Array(3)].map((_, i) => (
                     <motion.div
                       key={i}
                       className={`absolute w-2 h-2 bg-white/40 rounded-full ${
-                        i < 3 ? 'top-6' : 'bottom-6'
-                      } ${i % 3 === 0 ? 'left-6' : i % 3 === 1 ? 'left-1/2' : 'right-6'}`}
+                        i === 0 ? 'top-6 left-6' : i === 1 ? 'top-6 right-6' : 'bottom-6 left-1/2'
+                      }`}
                       animate={{ 
-                        y: [0, -15, 0], 
-                        opacity: [0.4, 1, 0.4],
-                        scale: [1, 1.2, 1]
+                        y: [0, -10, 0], 
+                        opacity: [0.3, 0.8, 0.3],
                       }}
                       transition={{ 
-                        duration: 2 + i * 0.3, 
+                        duration: 2 + i * 0.5, 
                         repeat: Infinity, 
-                        delay: i * 0.2 
+                        delay: i * 0.3 
                       }}
                     />
                   ))}
