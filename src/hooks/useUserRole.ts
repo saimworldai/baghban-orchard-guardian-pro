@@ -24,17 +24,26 @@ export function useUserRole() {
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no rows
           
         if (roleError) {
           console.error('Error fetching user role:', roleError);
-          // If no role found, default to farmer (new users get farmer role via trigger)
+          // If no role found, default to farmer
           setRole('farmer');
         } else if (roleData?.role) {
           setRole(roleData.role as UserRole);
         } else {
-          // Fallback to farmer role
-          setRole('farmer');
+          // No role found, create a default farmer role
+          console.log('No role found for user, creating farmer role');
+          try {
+            await supabase
+              .from('user_roles')
+              .insert({ user_id: user.id, role: 'farmer' });
+            setRole('farmer');
+          } catch (insertError) {
+            console.error('Error creating default role:', insertError);
+            setRole('farmer');
+          }
         }
       } catch (error) {
         console.error('Error fetching user role:', error);

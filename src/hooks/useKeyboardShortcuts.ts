@@ -15,6 +15,9 @@ export const useKeyboardShortcuts = (shortcuts: KeyboardShortcut[]) => {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       shortcuts.forEach(({ key, ctrlKey, altKey, shiftKey, metaKey, callback }) => {
+        // Add null check for key to prevent runtime errors
+        if (!key) return;
+        
         const keyMatches = event.key.toLowerCase() === key.toLowerCase();
         const ctrlMatches = ctrlKey ? event.ctrlKey : !event.ctrlKey;
         const altMatches = altKey ? event.altKey : !event.altKey;

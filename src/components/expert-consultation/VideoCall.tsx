@@ -37,20 +37,74 @@ export function VideoCall() {
   useEffect(() => {
     async function checkMediaDevices() {
       try {
-        // Try to access the camera and microphone
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        streamRef.current = stream;
+        console.log('Requesting media device access...');
         
-        setHasCameraAccess(true);
-        setHasMicrophoneAccess(true);
+        // Request permissions step by step for better error handling
+        let stream: MediaStream | null = null;
         
-        // Display camera preview
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+        try {
+          // First try to get just video
+          const videoStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            } 
+          });
+          console.log('Camera access granted');
+          setHasCameraAccess(true);
+          
+          // Then try to get audio
+          try {
+            const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            console.log('Microphone access granted');
+            setHasMicrophoneAccess(true);
+            
+            // Combine streams
+            const combinedStream = new MediaStream([
+              ...videoStream.getVideoTracks(),
+              ...audioStream.getAudioTracks()
+            ]);
+            stream = combinedStream;
+            
+            // Stop individual streams since we have combined
+            videoStream.getTracks().forEach(track => track.stop());
+            audioStream.getTracks().forEach(track => track.stop());
+          } catch (audioError) {
+            console.warn('Audio access denied, using video only:', audioError);
+            stream = videoStream;
+            setHasMicrophoneAccess(false);
+            toast.error('Microphone access denied. You can still join with video only.');
+          }
+        } catch (videoError) {
+          console.warn('Video access denied:', videoError);
+          setHasCameraAccess(false);
+          
+          // Try audio only
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            console.log('Audio-only access granted');
+            setHasMicrophoneAccess(true);
+            toast.error('Camera access denied. You can still join with audio only.');
+          } catch (audioError) {
+            console.error('Both camera and microphone access denied:', audioError);
+            setHasMicrophoneAccess(false);
+            toast.error('Please allow camera and microphone access to join video calls. Click the camera icon in your browser\'s address bar.');
+            return;
+          }
+        }
+        
+        if (stream) {
+          streamRef.current = stream;
+          
+          // Display camera preview if available
+          if (videoRef.current && stream.getVideoTracks().length > 0) {
+            videoRef.current.srcObject = stream;
+          }
         }
         
         // Get all available devices
         const devices = await navigator.mediaDevices.enumerateDevices();
+        console.log('Available devices:', devices);
         
         // Filter for video input (cameras)
         const cameras = devices.filter(device => device.kind === 'videoinput');
@@ -62,15 +116,20 @@ export function VideoCall() {
         setAvailableMicrophones(microphones);
         if (microphones.length > 0) setSelectedMicrophone(microphones[0].deviceId);
         
-        // Check connection quality (simplified simulation)
+        // Check connection quality
         checkConnectionQuality();
         
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error accessing media devices:', err);
-        if ((err as any).name === 'NotAllowedError' || (err as any).name === 'PermissionDeniedError') {
-          toast.error('Camera and microphone access is required for video calls');
+        
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          toast.error('Camera and microphone access is required for video calls. Please click "Allow" when prompted.');
+        } else if (err.name === 'NotFoundError') {
+          toast.error('No camera or microphone found on your device.');
+        } else if (err.name === 'NotReadableError') {
+          toast.error('Your camera or microphone is being used by another application.');
         } else {
-          toast.error('Error accessing your camera or microphone');
+          toast.error('Unable to access camera or microphone. Please check your device settings.');
         }
       } finally {
         setIsCheckingDevices(false);
@@ -91,23 +150,39 @@ export function VideoCall() {
   useEffect(() => {
     async function updateMediaStream() {
       if (!selectedCamera || !selectedMicrophone) return;
+      if (!hasCameraAccess && !hasMicrophoneAccess) return;
       
       try {
+        console.log('Updating media stream with new devices...');
+        
         // Stop previous tracks
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
         
+        // Create constraints for new stream
+        const constraints: MediaStreamConstraints = {};
+        
+        if (hasCameraAccess) {
+          constraints.video = { 
+            deviceId: selectedCamera,
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          };
+        }
+        
+        if (hasMicrophoneAccess) {
+          constraints.audio = { deviceId: selectedMicrophone };
+        }
+        
         // Create new stream with selected devices
-        const newStream = await navigator.mediaDevices.getUserMedia({
-          video: { deviceId: selectedCamera },
-          audio: { deviceId: selectedMicrophone }
-        });
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
         
         streamRef.current = newStream;
+        console.log('Media stream updated successfully');
         
         // Update video preview
-        if (videoRef.current) {
+        if (videoRef.current && newStream.getVideoTracks().length > 0) {
           videoRef.current.srcObject = newStream;
         }
       } catch (err) {
@@ -116,7 +191,7 @@ export function VideoCall() {
       }
     }
     
-    if (hasCameraAccess && hasMicrophoneAccess) {
+    if (hasCameraAccess || hasMicrophoneAccess) {
       updateMediaStream();
     }
   }, [selectedCamera, selectedMicrophone, hasCameraAccess, hasMicrophoneAccess]);
@@ -174,8 +249,9 @@ export function VideoCall() {
       return;
     }
     
-    if (!hasCameraAccess || !hasMicrophoneAccess) {
-      toast.error("Camera and microphone access are required for video calls");
+    // Allow call with either camera OR microphone access
+    if (!hasCameraAccess && !hasMicrophoneAccess) {
+      toast.error("Camera or microphone access is required for video calls");
       return;
     }
     
@@ -278,14 +354,22 @@ export function VideoCall() {
                 ) : (
                   <div className="text-white text-center p-4">
                     <Camera className="h-12 w-12 mx-auto mb-2 text-gray-400" />
-                    <p className="mb-2">Camera access is required</p>
-                    <Button 
-                      onClick={() => window.location.reload()}
-                      variant="outline"
-                      className="bg-white text-gray-800"
-                    >
-                      Allow Access
-                    </Button>
+                    <p className="mb-2">Camera access is required for video calls</p>
+                    <p className="text-sm text-gray-300 mb-4">
+                      Click the camera icon in your browser's address bar and select "Allow"
+                    </p>
+                    <div className="space-y-2">
+                      <Button 
+                        onClick={() => window.location.reload()}
+                        variant="outline"
+                        className="bg-white text-gray-800"
+                      >
+                        Try Again
+                      </Button>
+                      <p className="text-xs text-gray-400">
+                        You can still join with audio only if camera fails
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -376,7 +460,7 @@ export function VideoCall() {
                   className="w-full mt-6 bg-green-600 hover:bg-green-700"
                   size="lg"
                   onClick={handleStartCall}
-                  disabled={isCheckingDevices || !hasCameraAccess || !hasMicrophoneAccess || isCreatingCall}
+                  disabled={isCheckingDevices || (!hasCameraAccess && !hasMicrophoneAccess) || isCreatingCall}
                 >
                   {isCreatingCall ? (
                     <>
