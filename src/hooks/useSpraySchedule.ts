@@ -48,7 +48,10 @@ export function useSpraySchedule() {
 
   const createScheduleMutation = useMutation({
     mutationFn: async (scheduleData: CreateSprayScheduleData) => {
-      if (!user) throw new Error('User not authenticated');
+      if (!user) {
+        enhancedToast.error('Please sign in to create spray schedules');
+        throw new Error('User not authenticated');
+      }
       
       const { data, error } = await supabase
         .from('spray_schedules')
@@ -56,7 +59,10 @@ export function useSpraySchedule() {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -71,14 +77,23 @@ export function useSpraySchedule() {
 
   const updateScheduleMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<SpraySchedule> }) => {
+      if (!user) {
+        enhancedToast.error('Please sign in to update spray schedules');
+        throw new Error('User not authenticated');
+      }
+      
       const { data, error } = await supabase
         .from('spray_schedules')
         .update(updates)
         .eq('id', id)
+        .eq('user_id', user.id) // Ensure user can only update their own schedules
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
       return data;
     },
     onSuccess: () => {
@@ -93,12 +108,21 @@ export function useSpraySchedule() {
 
   const deleteScheduleMutation = useMutation({
     mutationFn: async (id: string) => {
+      if (!user) {
+        enhancedToast.error('Please sign in to delete spray schedules');
+        throw new Error('User not authenticated');
+      }
+      
       const { error } = await supabase
         .from('spray_schedules')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id); // Ensure user can only delete their own schedules
       
-      if (error) throw error;
+      if (error) {
+        console.error('Database error:', error);
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['spray_schedules'] });
