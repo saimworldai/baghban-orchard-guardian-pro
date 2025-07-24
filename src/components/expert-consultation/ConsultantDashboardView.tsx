@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Video, MessageSquare, Phone, Users, Clock, TrendingUp } from 'lucide-react';
 import { ConsultantDashboard } from './index';
+import { LiveCallNotifications } from './LiveCallNotifications';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/sonner';
 
@@ -120,6 +121,15 @@ export function ConsultantDashboardView() {
             </div>
           </CardContent>
         </Card>
+      </motion.div>
+
+      {/* Live Call Notifications */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <LiveCallNotifications />
       </motion.div>
 
       {/* Main Dashboard */}

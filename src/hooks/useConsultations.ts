@@ -32,16 +32,21 @@ export function useConsultations() {
 
   const acceptConsultation = async (consultationId: string) => {
     try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('Not authenticated');
+
       const { error } = await supabase
         .from('consultations')
         .update({ 
           status: 'scheduled',
-          consultant_id: (await supabase.auth.getUser()).data.user?.id
+          consultant_id: user.user.id,
+          scheduled_at: new Date().toISOString()
         })
-        .eq('id', consultationId);
+        .eq('id', consultationId)
+        .eq('consultant_id', null); // Only accept if not already assigned
         
       if (error) throw error;
-      toast.success('Consultation accepted');
+      toast.success('Consultation accepted! You can now start the call.');
       refetch();
     } catch (error) {
       console.error('Error accepting consultation:', error);
