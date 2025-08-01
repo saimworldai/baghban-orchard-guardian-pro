@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Video, CheckCircle } from "lucide-react";
 import { StatusBadge } from './StatusBadge';
 import { Consultation } from '@/types/consultations';
+import { useExpertBackend } from '@/hooks/useExpertBackend';
 
 interface ConsultationTableProps {
   consultations: Consultation[];
@@ -33,6 +34,7 @@ export function ConsultationTable({
   isActive,
   isCompleted
 }: ConsultationTableProps) {
+  const { acceptConsultation, startCall, loading } = useExpertBackend();
   return (
     <Card>
       <CardContent className="p-0">
@@ -70,9 +72,15 @@ export function ConsultationTable({
                     {isPending && onAccept && (
                       <Button
                         size="sm"
-                        onClick={() => onAccept(consultation.id)}
+                        onClick={async () => {
+                          const success = await acceptConsultation(consultation.id);
+                          if (success) {
+                            onAccept(consultation.id);
+                          }
+                        }}
+                        disabled={loading}
                       >
-                        Accept
+                        {loading ? 'Accepting...' : 'Accept'}
                       </Button>
                     )}
                     {isActive && (
@@ -81,9 +89,16 @@ export function ConsultationTable({
                           <Button
                             size="sm"
                             variant="default"
-                            onClick={() => onStartCall(consultation.id)}
+                            onClick={async () => {
+                              const success = await startCall(consultation.id);
+                              if (success) {
+                                onStartCall(consultation.id);
+                              }
+                            }}
+                            disabled={loading}
                           >
-                            <Video className="h-4 w-4 mr-1" /> Join Call
+                            <Video className="h-4 w-4 mr-1" /> 
+                            {loading ? 'Starting...' : 'Join Call'}
                           </Button>
                         )}
                         {onComplete && (
