@@ -56,24 +56,24 @@ export function EnhancedNavigation() {
     <motion.nav 
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      className="sticky top-0 z-50 w-full border-b border-border/50 glass backdrop-blur-xl shadow-lg"
     >
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
+          <Link to="/" className="flex items-center space-x-3 group">
             <motion.div
               whileHover={{ rotate: 15, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 400 }}
-              className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg shadow-lg"
+              className="p-2 gradient-primary rounded-xl shadow-glow"
             >
-              <Sprout className="h-6 w-6 text-white" />
+              <Sprout className="h-6 w-6 text-primary-foreground" />
             </motion.div>
             <div>
-              <span className="text-xl font-bold bg-gradient-to-r from-green-700 to-emerald-600 bg-clip-text text-transparent">
+              <span className="text-xl font-bold text-gradient-primary">
                 Baghban Guardian
               </span>
-              <div className="text-xs text-gray-500 font-medium">Free for Everyone</div>
+              <div className="text-xs text-muted-foreground font-medium">Free for Everyone</div>
             </div>
           </Link>
 
@@ -86,9 +86,9 @@ export function EnhancedNavigation() {
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     size="sm"
-                    className={`relative transition-all duration-200 ${
+                    className={`relative transition-all duration-300 hover-lift ${
                       isActive 
-                        ? "bg-primary text-primary-foreground shadow-md" 
+                        ? "gradient-primary text-primary-foreground shadow-elegant" 
                         : "hover:bg-accent hover:text-accent-foreground"
                     }`}
                   >
@@ -97,7 +97,7 @@ export function EnhancedNavigation() {
                     {item.badge && (
                       <Badge 
                         variant="secondary" 
-                        className="ml-2 text-xs bg-green-100 text-green-700 border-green-200"
+                        className="ml-2 text-xs bg-primary/10 text-primary border-primary/20 shadow-sm"
                       >
                         {item.badge}
                       </Badge>
@@ -123,7 +123,7 @@ export function EnhancedNavigation() {
                   </Button>
                 </Link>
                 <Link to="/disease-detection">
-                  <Button size="sm" className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                  <Button variant="premium" size="sm">
                     Try Free
                   </Button>
                 </Link>

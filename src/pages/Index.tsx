@@ -11,6 +11,7 @@ import { debounce } from '@/utils/performance';
 const FeaturesGrid = lazy(() => import('@/components/home/FeaturesGrid').then(module => ({ default: module.FeaturesGrid })));
 const TestimonialsSection = lazy(() => import('@/components/home/TestimonialsSection').then(module => ({ default: module.TestimonialsSection })));
 const CTASection = lazy(() => import('@/components/home/CTASection').then(module => ({ default: module.CTASection })));
+const ModernStatsSection = lazy(() => import('@/components/home/ModernStatsSection').then(module => ({ default: module.ModernStatsSection })));
 
 // Loading component with semantic tokens
 const SectionLoader = () => (
@@ -52,6 +53,10 @@ const Index = () => {
       
       <div className="container mx-auto py-8 space-y-16">
         <EnhancedHeroSection />
+        
+        <Suspense fallback={<SectionLoader />}>
+          <ModernStatsSection />
+        </Suspense>
         
         <Suspense fallback={<SectionLoader />}>
           <FeaturesGrid />

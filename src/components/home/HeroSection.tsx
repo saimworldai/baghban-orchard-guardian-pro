@@ -90,44 +90,61 @@ export function HeroSection() {
       variants={heroVariants}
       initial="hidden"
       animate="visible"
-      className="text-center mb-20 relative"
+      className="text-center mb-20 relative min-h-screen flex flex-col justify-center"
       role="banner"
       aria-labelledby="hero-title"
     >
-      <motion.div variants={itemVariants} className="mb-8">
-        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-100 to-blue-100 backdrop-blur-md px-6 py-3 rounded-full border border-green-200/50 shadow-lg mb-6">
+      {/* Background Elements */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="gradient-hero absolute inset-0"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full mix-blend-multiply filter blur-xl animate-float"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-accent/20 rounded-full mix-blend-multiply filter blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-secondary/15 rounded-full mix-blend-multiply filter blur-xl animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+      <motion.div variants={itemVariants} className="mb-8 relative z-10">
+        <div className="inline-flex items-center gap-3 glass backdrop-blur-md px-6 py-3 rounded-full shadow-elegant mb-6 border border-primary/20">
           <motion.div
             animate={{ rotate: [0, 360] }}
             transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            className="relative"
           >
-            <Sparkles className="h-5 w-5 text-green-600" />
+            <Sparkles className="h-5 w-5 text-primary" />
+            <div className="absolute inset-0 h-5 w-5 bg-primary/20 rounded-full animate-ping"></div>
           </motion.div>
-          <span className="text-sm font-semibold text-green-800">
+          <span className="text-sm font-semibold text-primary bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
             Trusted by 15,000+ farmers worldwide
           </span>
+          <CheckCircle className="h-4 w-4 text-primary" />
         </div>
       </motion.div>
 
       <motion.h1 
         id="hero-title"
         variants={itemVariants}
-        className="text-5xl md:text-7xl font-bold mb-8 leading-tight"
+        className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight relative z-10"
       >
-        <span className="bg-gradient-to-r from-green-700 via-emerald-600 to-blue-700 bg-clip-text text-transparent">
+        <span className="text-gradient-primary drop-shadow-lg">
           Smart Orchard
         </span>
         <br />
-        <span className="text-gray-800">
+        <span className="text-foreground drop-shadow-md">
           Management
         </span>
+        <motion.div
+          className="absolute -inset-4 bg-primary/5 rounded-3xl -z-10"
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        />
       </motion.h1>
 
       <motion.p 
         variants={itemVariants}
-        className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed"
+        className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-4xl mx-auto leading-relaxed relative z-10"
       >
-        Transform your orchard with AI-powered insights, real-time monitoring, 
-        and expert guidance. Increase yields by up to 45% while reducing costs.
+        Transform your orchard with{' '}
+        <span className="text-gradient-primary font-semibold">AI-powered insights</span>, 
+        real-time monitoring, and expert guidance. Increase yields by up to{' '}
+        <span className="text-primary font-bold">45%</span> while reducing costs.
       </motion.p>
 
       <motion.div variants={itemVariants} className="mb-12">
@@ -206,11 +223,12 @@ export function HeroSection() {
 
       <motion.div 
         variants={itemVariants}
-        className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+        className="flex flex-col sm:flex-row gap-6 justify-center items-center relative z-10"
       >
         <Button 
-          size="lg" 
-          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-12 py-4 text-lg font-bold shadow-xl hover:shadow-2xl transition-all duration-300 group"
+          variant="premium"
+          size="xl" 
+          className="group"
           aria-label="Start your free trial now"
           onClick={handleGetStarted}
         >
@@ -219,9 +237,9 @@ export function HeroSection() {
         </Button>
         
         <Button 
-          variant="outline" 
-          size="lg"
-          className="border-2 border-gray-300 hover:border-green-500 px-12 py-4 text-lg font-semibold transition-all duration-300 group"
+          variant="modern" 
+          size="xl"
+          className="group glass"
           aria-label="Watch product demo video"
           onClick={handleWatchDemo}
         >
@@ -232,11 +250,22 @@ export function HeroSection() {
 
       <motion.div 
         variants={itemVariants}
-        className="mt-12 text-sm text-gray-500"
+        className="mt-12 text-sm text-muted-foreground relative z-10"
       >
-        <p>
-          ✓ No credit card required • ✓ 14-day free trial • ✓ Cancel anytime
-        </p>
+        <div className="flex flex-wrap justify-center items-center gap-4 glass px-6 py-3 rounded-full backdrop-blur-sm border border-primary/10">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <span>No credit card required</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <span>14-day free trial</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4 text-primary" />
+            <span>Cancel anytime</span>
+          </div>
+        </div>
       </motion.div>
     </motion.section>
   );
