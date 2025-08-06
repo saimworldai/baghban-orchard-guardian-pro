@@ -29,13 +29,11 @@ export function EnhancedNavigation() {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
+    { name: 'Plant Doctor', href: '/disease-detection', icon: Microscope, badge: 'AI' },
     { name: 'Weather', href: '/weather-alerts', icon: CloudRain },
-    { name: 'Disease Detection', href: '/disease-detection', icon: Microscope, badge: 'AI' },
     { name: 'Expert Help', href: '/expert-consultation', icon: Users, badge: 'Free' },
-    { name: 'Spray Schedule', href: '/spray-schedule', icon: Calendar },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Integrations', href: '/integrations', icon: Settings },
+    { name: 'Plant Care', href: '/plant-care', icon: BarChart3 },
+    { name: 'Community', href: '/community', icon: Users },
   ];
 
   const handleVoiceCommand = (command: string) => {

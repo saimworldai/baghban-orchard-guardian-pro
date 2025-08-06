@@ -35,11 +35,23 @@ export const features: Feature[] = [
     link: "/disease-detection"
   },
   {
+    icon: Users,
+    secondaryIcon: MessageCircle,
+    title: "Expert Consultation",
+    description: "Get professional advice from agricultural experts. Video calls, chat support, and personalized farming guidance.",
+    benefits: ["Live video calls", "Expert advice", "Personalized solutions"],
+    color: "from-emerald-500 to-teal-500",
+    bgColor: "from-emerald-50 to-teal-50",
+    accentColor: "border-emerald-200",
+    thumbnailBg: "from-emerald-500 to-teal-600",
+    link: "/expert-consultation"
+  },
+  {
     icon: CloudRain,
     secondaryIcon: AlertTriangle,
-    title: "Garden Weather",
-    description: "Get weather forecasts tailored for your garden. Know when to water, when to protect plants, and when to harvest.",
-    benefits: ["Garden-specific forecasts", "Watering reminders", "Frost alerts"],
+    title: "Smart Weather",
+    description: "Get weather forecasts tailored for your farm. Know when to water, spray, and protect crops with precision timing.",
+    benefits: ["Farm-specific forecasts", "Spray timing", "Crop protection alerts"],
     color: "from-blue-500 to-cyan-500",
     bgColor: "from-blue-50 to-cyan-50",
     accentColor: "border-blue-200",
@@ -47,51 +59,15 @@ export const features: Feature[] = [
     link: "/weather-alerts"
   },
   {
-    icon: Users,
-    secondaryIcon: MessageCircle,
-    title: "Plant Community",
-    description: "Connect with fellow plant enthusiasts. Share photos, ask questions, and learn from experienced gardeners worldwide.",
-    benefits: ["Share experiences", "Get advice", "Learn together"],
-    color: "from-emerald-500 to-teal-500",
-    bgColor: "from-emerald-50 to-teal-50",
-    accentColor: "border-emerald-200",
-    thumbnailBg: "from-emerald-500 to-teal-600",
-    link: "/community"
-  },
-  {
-    icon: Calendar,
-    secondaryIcon: Clock,
-    title: "Garden Calendar",
-    description: "Never forget when to plant, water, or harvest again. Smart reminders based on your location and plant types.",
-    benefits: ["Planting reminders", "Care schedules", "Seasonal tips"],
-    color: "from-amber-500 to-orange-500",
-    bgColor: "from-amber-50 to-orange-50",
-    accentColor: "border-amber-200",
-    thumbnailBg: "from-amber-500 to-orange-600",
-    link: "/garden-calendar"
-  },
-  {
     icon: TrendingUp,
     secondaryIcon: Target,
-    title: "Plant Care Guide",
-    description: "Comprehensive guides for popular houseplants and garden plants. Learn how to care for each plant properly.",
-    benefits: ["Care instructions", "Growing tips", "Problem solving"],
+    title: "Crop Care Guide",
+    description: "Comprehensive growing guides for crops and vegetables. Learn modern farming techniques and best practices.",
+    benefits: ["Growing techniques", "Soil management", "Harvest optimization"],
     color: "from-green-500 to-emerald-500",
     bgColor: "from-green-50 to-emerald-50",
     accentColor: "border-green-200",
     thumbnailBg: "from-green-500 to-emerald-600",
     link: "/plant-care"
-  },
-  {
-    icon: Smartphone,
-    secondaryIcon: Download,
-    title: "Mobile First",
-    description: "Works perfectly on your phone. Take photos in your garden and get instant help, even with poor internet connection.",
-    benefits: ["Works offline", "Camera integration", "Quick access"],
-    color: "from-indigo-500 to-purple-500",
-    bgColor: "from-indigo-50 to-purple-50",
-    accentColor: "border-indigo-200",
-    thumbnailBg: "from-indigo-500 to-purple-600",
-    link: "/disease-detection"
   }
 ];
