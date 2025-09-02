@@ -16,6 +16,9 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { ThemeProvider } from "next-themes";
 import { useNavigate } from "react-router-dom";
+import { PageLoader } from "@/components/ui/loading-states";
+import { Suspense } from "react";
+import { AnimatePresence } from "framer-motion";
 
 // Import pages
 import Index from "./pages/Index";
@@ -71,11 +74,7 @@ function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode;
     }
 
     if (loading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
-        </div>
-      );
+      return <PageLoader text="Checking permissions..." />;
     }
 
     if (role !== 'admin') {
@@ -125,56 +124,59 @@ function AppRoutes() {
       <SkipToContent />
       <EnhancedNavigation />
       <main id="main-content" className="focus:outline-none" tabIndex={-1}>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          
-          {/* Public Routes - No Authentication Required */}
-          <Route path="/plant-care" element={<PlantCare />} />
-          <Route path="/weather-alerts" element={<WeatherAlerts />} />
-          <Route path="/disease-detection" element={<DiseaseDetection />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/garden-calendar" element={<GardenCalendar />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/integrations" element={<Integrations />} />
-          <Route path="/expert-consultation" element={<ExpertConsultation />} />
-          <Route path="/expert-consultation/video" element={<VideoCall />} />
-          <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
-          <Route path="/spray-schedule" element={<SpraySchedule />} />
-          
-          {/* User Profile - Optional Authentication */}
-          <Route path="/profile" element={<Profile />} />
-          
-          {/* Admin Routes - Require Authentication */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/consultations"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminConsultation />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/call-monitor"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <CallMonitor />
-              </ProtectedRoute>
-            }
-          />
-          
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AnimatePresence mode="wait">
+          <Suspense fallback={<PageLoader text="Loading page..." />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              
+              {/* Public Routes - No Authentication Required */}
+              <Route path="/plant-care" element={<PlantCare />} />
+              <Route path="/weather-alerts" element={<WeatherAlerts />} />
+              <Route path="/disease-detection" element={<DiseaseDetection />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/garden-calendar" element={<GardenCalendar />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/integrations" element={<Integrations />} />
+              <Route path="/expert-consultation" element={<ExpertConsultation />} />
+              <Route path="/expert-consultation/video" element={<VideoCall />} />
+              <Route path="/expert-consultation/call/:consultationId" element={<ExpertCall />} />
+              <Route path="/spray-schedule" element={<SpraySchedule />} />
+              
+              {/* User Profile - Optional Authentication */}
+              <Route path="/profile" element={<Profile />} />
+              
+              {/* Admin Routes - Require Authentication */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/consultations"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminConsultation />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/call-monitor"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <CallMonitor />
+                  </ProtectedRoute>
+                }
+              />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </AnimatePresence>
       </main>
       <OfflineIndicator />
       <PWAInstallPrompt />

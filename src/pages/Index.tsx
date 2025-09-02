@@ -6,19 +6,14 @@ import { useAuth } from '@/contexts/AuthProvider';
 import { motion } from 'framer-motion';
 import { enhancedToast } from '@/components/ui/enhanced-toast';
 import { debounce } from '@/utils/performance';
+import { SectionLoader } from '@/components/ui/loading-states';
+import { PageTransition } from '@/components/ui/professional-animations';
 
 // Lazy load essential components only
 const FeaturesGrid = lazy(() => import('@/components/home/FeaturesGrid').then(module => ({ default: module.FeaturesGrid })));
 const TestimonialsSection = lazy(() => import('@/components/home/TestimonialsSection').then(module => ({ default: module.TestimonialsSection })));
 const CTASection = lazy(() => import('@/components/home/CTASection').then(module => ({ default: module.CTASection })));
 const ModernStatsSection = lazy(() => import('@/components/home/ModernStatsSection').then(module => ({ default: module.ModernStatsSection })));
-
-// Loading component with semantic tokens
-const SectionLoader = () => (
-  <div className="flex items-center justify-center py-8">
-    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-  </div>
-);
 
 const Index = () => {
   const { user } = useAuth();
