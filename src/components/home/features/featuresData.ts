@@ -17,7 +17,8 @@ import {
   Lock,
   Download,
   PieChart,
-  Cpu
+  Cpu,
+  Snowflake
 } from 'lucide-react';
 import { Feature } from './types';
 
@@ -69,5 +70,17 @@ export const features: Feature[] = [
     accentColor: "border-green-200",
     thumbnailBg: "from-green-500 to-emerald-600",
     link: "/plant-care"
+  },
+  {
+    icon: Snowflake,
+    secondaryIcon: Shield,
+    title: "Winter Care (Kashmir)",
+    description: "Specialized winter protection for Kashmir apple orchards. Frost prevention, disease management, and cold weather care.",
+    benefits: ["Frost protection", "Winter diseases", "Cold weather management"],
+    color: "from-blue-600 to-cyan-600",
+    bgColor: "from-blue-50 to-cyan-50",
+    accentColor: "border-blue-200",
+    thumbnailBg: "from-blue-600 to-cyan-600",
+    link: "/winter-care"
   }
 ];

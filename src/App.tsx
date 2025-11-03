@@ -23,6 +23,7 @@ import { AnimatePresence } from "framer-motion";
 // Import pages
 import Index from "./pages/Index";
 import PlantCare from "./pages/PlantCare";
+import WinterCare from "./pages/WinterCare";
 import Community from "./pages/Community";
 import GardenCalendar from "./pages/GardenCalendar";
 import Dashboard from "./pages/Dashboard";
@@ -132,6 +133,7 @@ function AppRoutes() {
               
               {/* Public Routes - No Authentication Required */}
               <Route path="/plant-care" element={<PlantCare />} />
+              <Route path="/winter-care" element={<WinterCare />} />
               <Route path="/weather-alerts" element={<WeatherAlerts />} />
               <Route path="/disease-detection" element={<DiseaseDetection />} />
               <Route path="/community" element={<Community />} />
